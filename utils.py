@@ -5,7 +5,7 @@ import numpy as np
 
 from PIL import Image, ImageFile
 from typing import List, Tuple
-from transformers import LlavaNextProcessor, AutoTokenizer
+from transformers import LlavaNextProcessor, LlavaNextVideoProcessor, AutoTokenizer, AutoProcessor
 from vllm import SamplingParams
 
 
@@ -45,13 +45,38 @@ def get_caps(tokenizer: AutoTokenizer, data: List[dict]) -> List[Tuple[int, int]
     
     return lengths
 
+def get_clotho(tokenizer: AutoTokenizer, data: List[dict]) -> List[Tuple[int, int]]:
+    lengths = []
+    for record in data:
+        input_tokens = [] # Audio Understanding use case doesn't have any context
+
+        output_tokens = tokenizer.encode(record["caption"])[1:]
+
+        lengths.append((len(input_tokens), len(output_tokens)))
+    
+    return lengths
+
 def get_llava(tokenizer: AutoTokenizer, data: List[dict]) -> List[Tuple[int, int]]:
     lengths = []
     for record in data:
         if not (record["conversations"][0]["from"] == "human" and record["conversations"][1]["from"] == "gpt"):
             continue
         
-        input_tokens = tokenizer.encode(record["conversations"][0]["value"].replace("<image>\n", ""))[1:]
+        input_tokens = tokenizer.encode(record["conversations"][0]["value"].replace("<image>\n", "").replace("\n<image>", ""))[1:]
+
+        output_tokens = tokenizer.encode(record["conversations"][1]["value"])[1:]
+
+        lengths.append((len(input_tokens), len(output_tokens)))
+        
+    return lengths
+
+def get_sharegpt(tokenizer: AutoTokenizer, data: List[dict]) -> List[Tuple[int, int]]:
+    lengths = []
+    for record in data:
+        if not (record["conversations"][0]["from"] == "human" and record["conversations"][1]["from"] == "gpt"):
+            continue
+        
+        input_tokens = tokenizer.encode(record["conversations"][0]["value"])[1:]
 
         output_tokens = tokenizer.encode(record["conversations"][1]["value"])[1:]
 
@@ -70,6 +95,9 @@ def get_vqa_prompts(data: List[dict]) -> List[str]:
 def get_caps_prompts(data: List[dict]) -> List[str]:
     return ["Describe the image concisely."] * len(data)
 
+def get_clotho_prompts(data: List[dict]) -> List[str]:
+    return ["Please describe this audio."] * len(data)
+
 def get_llava_prompts(data: List[dict], use_case: str = "Detailed Descirption") -> List[str]:
     prompts = []
     for record in data:
@@ -82,6 +110,16 @@ def get_llava_prompts(data: List[dict], use_case: str = "Detailed Descirption") 
             input_seq = input_seq + "\nPlease describe the image in detail."
         
         prompts.append(input_seq)
+        
+    return prompts
+
+def get_sharegpt_prompts(data: List[dict]) -> List[str]:
+    prompts = []
+    for record in data:
+        if not (record["conversations"][0]["from"] == "human" and record["conversations"][1]["from"] == "gpt"):
+            continue
+        
+        prompts.append("[INST] " + record["conversations"][0]["value"] + " [/INST]")
         
     return prompts
 
@@ -112,12 +150,36 @@ def get_llava_image_paths(data: List[dict], dir: str) -> List[str]:
         
     return image_paths
 
+def get_llava_video_paths(data: List[dict], dir: str) -> List[str]:
+    image_paths = []
+    for record in data:
+        if not (record["conversations"][0]["from"] == "human" and record["conversations"][1]["from"] == "gpt"):
+            continue
+        
+        image_path = os.path.join(dir, record["video"])
+        image_paths.append(image_path)
+        
+    return image_paths
+
+def get_clotho_audio_paths(data: List[dict], dir: str) -> List[str]:
+    audio_paths = []
+    for record in data:
+        audio_path = os.path.join(dir, record["audio_id"])
+        audio_paths.append(audio_path)
+        
+    return audio_paths
+
 def get_lengths(dataset_alias):
     functions = {
         "vqa": get_vqa,
-        "caps": get_caps,
-        "detail": get_llava,
-        "complex": get_llava
+        "imgcaps": get_caps,
+        "detaildesc": get_llava,
+        "compreason": get_llava,
+        "conv": get_sharegpt,
+        "mcvidqa": get_llava,
+        "viddesc": get_llava,
+        "oevidqa": get_llava,
+        "audiound": get_clotho,
     }
 
     # Return the selected function or a default one if the key doesn't exist
@@ -126,9 +188,14 @@ def get_lengths(dataset_alias):
 def get_prompts(dataset_alias):
     functions = {
         "vqa": get_vqa_prompts,
-        "caps": get_caps_prompts,
-        "detail": get_llava_prompts,
-        "complex": get_llava_prompts
+        "imgcaps": get_caps_prompts,
+        "detaildesc": get_llava_prompts,
+        "compreason": get_llava_prompts,
+        "conv": get_sharegpt_prompts,
+        "mcvidqa": get_llava_prompts,
+        "viddesc": get_llava_prompts,
+        "oevidqa": get_llava_video_paths,
+        "audiound": get_clotho_prompts,
     }
 
     # Return the selected function or a default one if the key doesn't exist
@@ -137,9 +204,27 @@ def get_prompts(dataset_alias):
 def get_image_paths(dataset_alias):
     functions = {
         "vqa": get_vqa_image_paths,
-        "caps": get_caps_image_paths,
-        "detail": get_llava_image_paths,
-        "complex": get_llava_image_paths
+        "imgcaps": get_caps_image_paths,
+        "detaildesc": get_llava_image_paths,
+        "compreason": get_llava_image_paths
+    }
+
+    # Return the selected function or a default one if the key doesn't exist
+    return functions.get(dataset_alias, lambda: None)
+
+def get_video_paths(dataset_alias):
+    functions = {
+        "mcvidqa": get_llava_video_paths,
+        "viddesc": get_llava_video_paths,
+        "oevidqa": get_llava_video_paths
+    }
+
+    # Return the selected function or a default one if the key doesn't exist
+    return functions.get(dataset_alias, lambda: None)
+
+def get_audio_paths(dataset_alias):
+    functions = {
+        "audiound": get_clotho_audio_paths,
     }
 
     # Return the selected function or a default one if the key doesn't exist
@@ -167,6 +252,55 @@ def generate_prompt(model: str, prompt: str, image_flag: bool = True, prompt_fla
 
     return fromatted_prompt
 
+def generate_video_prompt(model: str, prompt: str, video_flag: bool = True, prompt_flag: bool = True) -> str:
+    processor = LlavaNextVideoProcessor.from_pretrained(model)
+
+    conversation = [
+        {
+            "role": "user",
+            "content": [],
+        }
+    ]
+    if video_flag:
+        conversation[0]["content"].append({"type": "video"})
+
+    if prompt_flag:
+        conversation[0]["content"].append({"type": "text", "text": prompt})
+
+    fromatted_prompt = processor.apply_chat_template(
+        conversation,
+        add_generation_prompt=True
+    )
+
+    return fromatted_prompt
+
+def generate_audio_prompt(model: str, prompt: str, audio_flag: bool = True) -> str:
+    import librosa
+    processor = AutoProcessor.from_pretrained(model)
+
+    conversation = [
+        {
+            "role": "user",
+            "content": [],
+        }
+    ]
+
+    audio_in_prompt = ""
+    if audio_flag:
+        conversation[0]["content"].append({"type": "audio"})
+
+        audio_in_prompt = "".join([
+            f"Audio 1: "
+            f"<|audio_bos|><|AUDIO|><|audio_eos|>\n"
+        ])
+    
+    fromatted_prompt = ("<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n"
+              "<|im_start|>user\n"
+              f"{audio_in_prompt}{prompt}<|im_end|>\n"
+              "<|im_start|>assistant\n")
+    
+    return fromatted_prompt
+
 def load_image(path: str) -> ImageFile.ImageFile:
     return Image.open(path)
 
@@ -183,17 +317,20 @@ def sample_requests(
     data = load_dataset(ds_path)
 
     # Get prompts
-    if ds_meta["alias"] in ["detail", "complex"]:
-        prompts = get_prompts(ds_meta["alias"])(data, use_case=dataset, num_of_records=num_requests)
+    if ds_meta["alias"] in ["detaildesc", "compreason"]:
+        prompts = get_prompts(ds_meta["alias"])(data, use_case=dataset)
     else:
-        prompts = get_prompts(ds_meta["alias"])(data, num_of_records=num_requests)
+        prompts = get_prompts(ds_meta["alias"])(data)
     
     # Get image paths
-    dir = os.path.join(ds_meta["path"], "images")
-    image_paths = get_image_paths(ds_meta["alias"])(data, dir, num_of_records=num_requests)
+    if image_flag:
+        dir = os.path.join(ds_meta["path"], "images")
+        image_paths = get_image_paths(ds_meta["alias"])(data, dir)
+    else:
+        image_paths = [""] * len(prompts)
 
     # Get output lengths
-    lengths = get_lengths(ds_meta["alias"])(tokenizer, data, num_of_records=num_requests)
+    lengths = get_lengths(ds_meta["alias"])(tokenizer, data)
     _, output_lengths = map(list, zip(*lengths))
 
     requests = []
@@ -203,10 +340,9 @@ def sample_requests(
 
         formatted_prompt = generate_prompt(model, prompt, image_flag=image_flag)
 
-        # Load the image using PIL.Image
-        image = load_image(image_path)
-
         if image_flag:
+            # Load the image using PIL.Image
+            image = load_image(image_path)
             final_prompt = {
                 "prompt": formatted_prompt,
                 "multi_modal_data": {"image": image},

@@ -67,7 +67,7 @@ if __name__ == '__main__':
                 "image_size_pixel": 0,
                 "decode_tokens_cnt": len(req_output.outputs[0].token_ids),
                 "processor_time": req_output.metrics.processor_time,
-                "multi_modal_time": req_output.metrics.multi_modal_time,
+                "encoder_time": req_output.metrics.encoder_time,
                 "text_time": req_output.metrics.text_time,
                 "visual_time": req_output.metrics.visual_time,
                 "merge_time": req_output.metrics.merge_time,
@@ -85,4 +85,5 @@ if __name__ == '__main__':
         del llm.llm_engine.model_executor
         del llm
         gc.collect()
+        torch.distributed.destroy_process_group()
         torch.cuda.empty_cache()

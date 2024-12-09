@@ -6,16 +6,37 @@ FIGURES_DIR = os.path.join(ROOT_DIR, "figures")
 
 MODELS_DIR = "/srv/muse-lab/models"
 MODELS = {
-    "LLaVA 1.6 (Mistral-7b)": {
-        "model_path": "llava-hf/llava-v1.6-mistral-7b-hf", # os.path.join(MODELS_DIR, "llava-v1.6-mistral-7b-hf"),
+    "Mistral-7b": {
+        "model_path": os.path.join(MODELS_DIR, "Mistral-7B-Instruct-v0.2"), # "mistralai/Mistral-7B-Instruct-v0.3",
         "max_model_len": 32768,
-        "alias": "mistral"
+        "alias": "text_mistral",
+    },
+    "LLaVA 1.6 (Mistral-7b)": {
+        "model_path": "llava-hf/llava-v1.6-mistral-7b-hf",
+        "max_model_len": 32768,
+        "alias": "image_mistral",
+        "image_token_index": 32000
     },
     "LLaVA 1.6 (Vicuna-7b)": {
-        "model_path": "llava-hf/llava-v1.6-vicuna-7b-hf", # os.path.join(MODELS_DIR, "llava-v1.6-vicuna-7b-hf"),
+        "model_path": "llava-hf/llava-v1.6-vicuna-7b-hf",
         "max_model_len": 4096,
-        "alias": "vicuna"
+        "alias": "image_vicuna",
+        "image_token_index": 32000
     },
+    "LLaVA-Next-Video (Mistral-7b)": {
+        "model_path": "llava-hf/LLaVA-NeXT-Video-7B-32K-hf",
+        "max_model_len": 32768,
+        "alias": "video_mistral",
+        "image_token_index": 32001,
+        "video_token_index": 32000,
+    },
+    "Qwen2-Audio-7b": {
+        "model_path": "Qwen/Qwen2-Audio-7B-Instruct",
+        "max_model_len": 8192,
+        "alias": "audio_qwen",
+        "audio_token_index": 151646
+    }
+
 }
 
 DATASETS_DIR = "/srv/muse-lab/datasets"
@@ -25,41 +46,59 @@ DATASETS = {
         "file": "aokvqa.jsonl",
         "alias": "vqa",
         "color": "#F8DE4B",
-        # Question: <question> Answer: (https://arxiv.org/pdf/2206.01718)
-
-        # <question> Answer the question using a single word or phrase. (https://github.com/haotian-liu/LLaVA/blob/main/docs/Evaluation.md)
-
-        # <question> (https://github.com/haotian-liu/LLaVA/blob/main/docs/Evaluation.md)
-        # A. <option_1>
-        # B. <option_2>
-        # C. <option_3>
-        # D. <option_4>
-        # Answer with the option's letter from the given choices directly.
-
-        # Based on the above image, please answer the question. <question> Please provide an accurate answer within one word. The answer is: (Custom https://arxiv.org/pdf/2401.10208)
     },
     "Image Captioning": {
         "path": os.path.join(DATASETS_DIR, "NoCaps"),
         "file": "nocaps.jsonl",
-        "alias": "caps",
+        "alias": "imgcaps",
         "color": "#577FBC",
-        # Describe the image concisely. (https://arxiv.org/pdf/2304.08485)
-        # Provide a one-sentence caption for the provided image. (https://arxiv.org/pdf/2401.10208)
     },
     "Detailed Description": {
         "path": os.path.join(DATASETS_DIR, "LLaVA-Instruct-150K"),
         "file": "detail.jsonl",
-        "alias": "detail",
+        "alias": "detaildesc",
         "color": "#E16F65",
-        # Describe the following image in detail (https://arxiv.org/pdf/2304.08485)
-        # Please describe the image in detail. (https://arxiv.org/pdf/2401.10208)
     },
     "Complex Reasoning": {
         "path": os.path.join(DATASETS_DIR, "LLaVA-Instruct-150K"),
         "file": "complex_reasoning.jsonl",
-        "alias": "complex",
+        "alias": "compreason",
         "color": "#57B593",
-        # Question: <question> Answer: (https://arxiv.org/pdf/2206.01718)
-        # <no post processing> (https://github.com/haotian-liu/LLaVA/blob/main/docs/Evaluation.md)
+    },
+    "Multiple-Choice Video Q&A": {
+        "path": os.path.join(DATASETS_DIR, "LLaVA-Video"),
+        "file": "multiple_choice.jsonl",
+        "alias": "mcvidqa",
+        "color": "#F8DE4B",
+    },
+    "Video Description": {
+        "path": os.path.join(DATASETS_DIR, "LLaVA-Video"),
+        "file": "description.jsonl",
+        "alias": "viddesc",
+        "color": "#E16F65",
+    },
+    "Open-Ended Video Q&A": {
+        "path": os.path.join(DATASETS_DIR, "LLaVA-Video"),
+        "file": "open_ended.jsonl",
+        "alias": "oevidqa",
+        "color": "#57B593",
+    },
+    "Multi-Image Q&A": {
+        "path": os.path.join(DATASETS_DIR, "Mantis-Instruct"),
+        "file": "multi_image_qa.jsonl",
+        "alias": "miqa",
+        "color": "#577FBC",
+    },
+    "Conversations": {
+        "path": os.path.join(DATASETS_DIR, "ShareGPT"),
+        "file": "sharegpt.jsonl",
+        "alias": "conv",
+        "color": "#577FBC",
+    },
+    "Audio Understanding": {
+        "path": os.path.join(DATASETS_DIR, "Clotho"),
+        "file": "understanding.jsonl",
+        "alias": "audiound",
+        "color": "#E16F65",
     },
 }

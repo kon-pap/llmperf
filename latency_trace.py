@@ -137,4 +137,5 @@ if __name__ == '__main__':
         del llm.llm_engine.model_executor
         del llm
         gc.collect()
+        torch.distributed.destroy_process_group()
         torch.cuda.empty_cache()
