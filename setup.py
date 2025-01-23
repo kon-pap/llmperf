@@ -8,7 +8,7 @@ setup(
     description="LLMPerf Inference is a benchmark suite for measuring how fast systems can run MLLMs in a variety of deployment scenarios.",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/your-repo",
+    url="https://gitlab.software.imdea.org/muse-lab/mllm-inference-workload-eval",
     packages=find_packages("src"),
     package_dir={"": "src"}, 
     install_requires=[
