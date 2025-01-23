@@ -1,0 +1,3 @@
+[submodule "vllm"]
+	path = vllm
+	url = https://gitlab.software.imdea.org/muse-lab/vllm.git
