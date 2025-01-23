@@ -1,10 +1,27 @@
-archived/**
-artifacts/**
-figures/**
-vllm/
-visualization/**
-experimentation/**
+# Byte-compiled files
+__pycache__/
 
-__pycache__/**
-nohup.out
+# Distribution / packaging
 .python-version
+*.egg-info/
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyCharm
+.idea/
+
+# VSCode
+.vscode/
+
+# MacOS
+.DS_Store
