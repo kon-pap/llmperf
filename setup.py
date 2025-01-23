@@ -12,7 +12,7 @@ setup(
     packages=find_packages("src"),
     package_dir={"": "src"}, 
     install_requires=[
-        "ffmpeg>=1.4",
+        "ffmpeg-python>=0.2.0",
         "pillow>=10.4.0"
     ],
     python_requires=">=3.9",
