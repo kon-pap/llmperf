@@ -2,7 +2,6 @@
 __pycache__/
 
 # Distribution / packaging
-.python-version
 *.egg-info/
 
 # Environments
@@ -13,6 +12,9 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Python version management
+.python-version
 
 # Jupyter Notebook
 .ipynb_checkpoints
