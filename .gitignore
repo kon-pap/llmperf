@@ -27,3 +27,16 @@ venv.bak/
 
 # MacOS
 .DS_Store
+
+# giannis
+BurstGPT/
+artifacts/audio_qwen_stats.json
+artifacts/idefics3_stats.json
+artifacts/image_mistral_stats.json
+artifacts/requests_sharegpt.pkl
+artifacts/requests_sharegpt_plus_mods.pkl
+artifacts/requests_sharegpt_plus_mods_lens.pkl
+artifacts/text_mistral_stats.json
+artifacts/video_mistral_stats.json
+artifacts_kon_pap/
+vllm/
