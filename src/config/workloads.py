@@ -48,7 +48,8 @@ class Workload:
         return False
     
     def save(self):
-        with open(self.path, "w", encoding="utf-8") as file:
+        path = os.path.join(self.path, f"{self.alias}.jsonl")
+        with open(path, "w", encoding="utf-8") as file:
             for i, request in enumerate(self.requests):
                 entry = {"request": asdict(request)}
                 if self.timestamps:
@@ -56,11 +57,12 @@ class Workload:
                 file.write(json.dumps(entry) + "\n")
 
     def load(self):
-        with open(self.path, "r", encoding="utf-8") as file:
+        path = os.path.join(self.path, f"{self.alias}.jsonl")
+        with open(path, "r", encoding="utf-8") as file:
             for line in file:
                 entry = json.loads(line)
                 self.requests.append(Request(**entry["request"]))
-                if hasattr(entry, "timestamp"):
+                if "timestamp" in entry:
                     self.timestamps.append(entry["timestamp"])
         if self.timestamps:
             assert len(self.timestamps) == len(self.requests)
@@ -68,28 +70,28 @@ class Workload:
 _WORKLOADS_STATIC = {
     Workload(
         name="Text Conversations",
-        path=os.path.join(WORKLOADS_DIR, "text-static.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "static"),
         alias="text-static",
         modalities="text",
         modality_pct=1.0
     ),
     Workload(
         name="Image Reasoning",
-        path=os.path.join(WORKLOADS_DIR, "image-static.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "static"),
         alias="image-static",
         modalities="image",
         modality_pct=1.0
     ),
     Workload(
         name="Video Description",
-        path=os.path.join(WORKLOADS_DIR, "video-static.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "static"),
         alias="video-static",
         modalities="video",
         modality_pct=1.0
     ),
     Workload(
         name="Audio Captioning",
-        path=os.path.join(WORKLOADS_DIR, "audio-static.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "static"),
         alias="audio-static",
         modalities="audio",
         modality_pct=1.0
@@ -100,7 +102,7 @@ _WORKLOADS_STATIC = {
 _WORKLOADS_TEXT_POISSON = {
     Workload(
         name="Text Conversations with Poisson 0.1",
-        path=os.path.join(WORKLOADS_DIR, "text-poisson-0.1.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-poisson"),
         alias="text-poisson-0.1",
         arrival_dist="poisson",
         modalities="text",
@@ -109,7 +111,7 @@ _WORKLOADS_TEXT_POISSON = {
 
     Workload(
         name="Text Conversations with Poisson 0.5",
-        path=os.path.join(WORKLOADS_DIR, "text-poisson-0.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-poisson"),
         alias="text-poisson-0.5",
         arrival_dist="poisson",
         modalities="text",
@@ -118,7 +120,7 @@ _WORKLOADS_TEXT_POISSON = {
 
     Workload(
         name="Text Conversations with Poisson 1.0",
-        path=os.path.join(WORKLOADS_DIR, "text-poisson-1.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-poisson"),
         alias="text-poisson-1.0",
         arrival_dist="poisson",
         modalities="text",
@@ -127,7 +129,7 @@ _WORKLOADS_TEXT_POISSON = {
 
     Workload(
         name="Text Conversations with Poisson 1.5",
-        path=os.path.join(WORKLOADS_DIR, "text-poisson-1.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-poisson"),
         alias="text-poisson-1.5",
         arrival_dist="poisson",
         modalities="text",
@@ -136,7 +138,7 @@ _WORKLOADS_TEXT_POISSON = {
 
     Workload(
         name="Text Conversations with Poisson 2.0",
-        path=os.path.join(WORKLOADS_DIR, "text-poisson-2.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-poisson"),
         alias="text-poisson-2.0",
         arrival_dist="poisson",
         modalities="text",
@@ -145,7 +147,7 @@ _WORKLOADS_TEXT_POISSON = {
 
     Workload(
         name="Text Conversations with Poisson 2.5",
-        path=os.path.join(WORKLOADS_DIR, "text-poisson-2.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-poisson"),
         alias="text-poisson-2.5",
         arrival_dist="poisson",
         modalities="text",
@@ -154,7 +156,7 @@ _WORKLOADS_TEXT_POISSON = {
 
     Workload(
         name="Text Conversations with Poisson 3.0",
-        path=os.path.join(WORKLOADS_DIR, "text-poisson-3.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-poisson"),
         alias="text-poisson-3.0",
         arrival_dist="poisson",
         modalities="text",
@@ -163,7 +165,7 @@ _WORKLOADS_TEXT_POISSON = {
 
     Workload(
         name="Text Conversations with Poisson 3.5",
-        path=os.path.join(WORKLOADS_DIR, "text-poisson-3.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-poisson"),
         alias="text-poisson-3.5",
         arrival_dist="poisson",
         modalities="text",
@@ -172,7 +174,7 @@ _WORKLOADS_TEXT_POISSON = {
 
     Workload(
         name="Text Conversations with Poisson 4.0",
-        path=os.path.join(WORKLOADS_DIR, "text-poisson-4.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-poisson"),
         alias="text-poisson-4.0",
         arrival_dist="poisson",
         modalities="text",
@@ -181,7 +183,7 @@ _WORKLOADS_TEXT_POISSON = {
 
     Workload(
         name="Text Conversations with Poisson 4.5",
-        path=os.path.join(WORKLOADS_DIR, "text-poisson-4.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-poisson"),
         alias="text-poisson-4.5",
         arrival_dist="poisson",
         modalities="text",
@@ -190,7 +192,7 @@ _WORKLOADS_TEXT_POISSON = {
 
     Workload(
         name="Text Conversations with Poisson 5.0",
-        path=os.path.join(WORKLOADS_DIR, "text-poisson-5.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-poisson"),
         alias="text-poisson-5.0",
         arrival_dist="poisson",
         modalities="text",
@@ -199,7 +201,7 @@ _WORKLOADS_TEXT_POISSON = {
 
     Workload(
         name="Text Conversations with Poisson 5.5",
-        path=os.path.join(WORKLOADS_DIR, "text-poisson-5.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-poisson"),
         alias="text-poisson-5.5",
         arrival_dist="poisson",
         modalities="text",
@@ -208,7 +210,7 @@ _WORKLOADS_TEXT_POISSON = {
 
     Workload(
         name="Text Conversations with Poisson 6.0",
-        path=os.path.join(WORKLOADS_DIR, "text-poisson-6.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-poisson"),
         alias="text-poisson-6.0",
         arrival_dist="poisson",
         modalities="text",
@@ -217,7 +219,7 @@ _WORKLOADS_TEXT_POISSON = {
 
     Workload(
         name="Text Conversations with Poisson 6.5",
-        path=os.path.join(WORKLOADS_DIR, "text-poisson-6.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-poisson"),
         alias="text-poisson-6.5",
         arrival_dist="poisson",
         modalities="text",
@@ -226,7 +228,7 @@ _WORKLOADS_TEXT_POISSON = {
 
     Workload(
         name="Text Conversations with Poisson 7.0",
-        path=os.path.join(WORKLOADS_DIR, "text-poisson-7.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-poisson"),
         alias="text-poisson-7.0",
         arrival_dist="poisson",
         modalities="text",
@@ -235,7 +237,7 @@ _WORKLOADS_TEXT_POISSON = {
 
     Workload(
         name="Text Conversations with Poisson 7.5",
-        path=os.path.join(WORKLOADS_DIR, "text-poisson-7.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-poisson"),
         alias="text-poisson-7.5",
         arrival_dist="poisson",
         modalities="text",
@@ -244,7 +246,7 @@ _WORKLOADS_TEXT_POISSON = {
 
     Workload(
         name="Text Conversations with Poisson 8.0",
-        path=os.path.join(WORKLOADS_DIR, "text-poisson-8.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-poisson"),
         alias="text-poisson-8.0",
         arrival_dist="poisson",
         modalities="text",
@@ -253,7 +255,7 @@ _WORKLOADS_TEXT_POISSON = {
 
     Workload(
         name="Text Conversations with Poisson 8.5",
-        path=os.path.join(WORKLOADS_DIR, "text-poisson-8.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-poisson"),
         alias="text-poisson-8.5",
         arrival_dist="poisson",
         modalities="text",
@@ -262,7 +264,7 @@ _WORKLOADS_TEXT_POISSON = {
 
     Workload(
         name="Text Conversations with Poisson 9.0",
-        path=os.path.join(WORKLOADS_DIR, "text-poisson-9.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-poisson"),
         alias="text-poisson-9.0",
         arrival_dist="poisson",
         modalities="text",
@@ -271,7 +273,7 @@ _WORKLOADS_TEXT_POISSON = {
 
     Workload(
         name="Text Conversations with Poisson 9.5",
-        path=os.path.join(WORKLOADS_DIR, "text-poisson-9.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-poisson"),
         alias="text-poisson-9.5",
         arrival_dist="poisson",
         modalities="text",
@@ -280,24 +282,8 @@ _WORKLOADS_TEXT_POISSON = {
 
     Workload(
         name="Text Conversations with Poisson 10.0",
-        path=os.path.join(WORKLOADS_DIR, "text-poisson-10.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-poisson"),
         alias="text-poisson-10.0",
-        arrival_dist="poisson",
-        modalities="text",
-        modality_pct=1.0
-    ),
-    Workload(
-        name="Text Conversations with Poisson 15.0",
-        path=os.path.join(WORKLOADS_DIR, "text-poisson-15.0.jsonl"),
-        alias="text-poisson-15.0",
-        arrival_dist="poisson",
-        modalities="text",
-        modality_pct=1.0
-    ),
-    Workload(
-        name="Text Conversations with Poisson 20.0",
-        path=os.path.join(WORKLOADS_DIR, "text-poisson-20.0.jsonl"),
-        alias="text-poisson-20.0",
         arrival_dist="poisson",
         modalities="text",
         modality_pct=1.0
@@ -307,228 +293,189 @@ _WORKLOADS_TEXT_POISSON = {
 # Mixed Modalities with Poisson | Varying request rate | Top 15% replaced
 _WORKLOADS_MIX_POISSON_15 = {
     Workload(
-        name="Mixed Modalities with Poisson 0.1",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3-0.1.jsonl"),
-        alias="mix-poisson-0.1",
-        arrival_dist="poisson",
-        modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.85, 0.05, 0.05, 0.05],
-        modality_dist="uniform"
-    ),
-
-    Workload(
-        name="Mixed Modalities with Poisson 0.5",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3-0.5.jsonl"),
-        alias="mix-poisson-0.5",
-        arrival_dist="poisson",
-        modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.85, 0.05, 0.05, 0.05],
-        modality_dist="uniform"
-    ),
-
-    Workload(
-        name="Mixed Modalities with Poisson 1.0",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3-1.0.jsonl"),
-        alias="mix-poisson-1.0",
-        arrival_dist="poisson",
-        modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.85, 0.05, 0.05, 0.05],
-        modality_dist="uniform"
-    ),
-
-    Workload(
-        name="Mixed Modalities with Poisson 1.5",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3-1.5.jsonl"),
-        alias="mix-poisson-1.5",
-        arrival_dist="poisson",
-        modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.85, 0.05, 0.05, 0.05],
-        modality_dist="uniform"
-    ),
-
-    Workload(
-        name="Mixed Modalities with Poisson 2.0",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3-2.0.jsonl"),
-        alias="mix-poisson-2.0",
-        arrival_dist="poisson",
-        modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.85, 0.05, 0.05, 0.05],
-        modality_dist="uniform"
-    ),
-
-    Workload(
-        name="Mixed Modalities with Poisson 2.5",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3-2.5.jsonl"),
-        alias="mix-poisson-2.5",
-        arrival_dist="poisson",
-        modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.85, 0.05, 0.05, 0.05],
-        modality_dist="uniform"
-    ),
-
-    Workload(
-        name="Mixed Modalities with Poisson 3.0",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3-3.0.jsonl"),
-        alias="mix-poisson-3.0",
-        arrival_dist="poisson",
-        modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.85, 0.05, 0.05, 0.05],
-        modality_dist="uniform"
-    ),
-
-    Workload(
-        name="Mixed Modalities with Poisson 3.5",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3-3.5.jsonl"),
-        alias="mix-poisson-3.5",
-        arrival_dist="poisson",
-        modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.85, 0.05, 0.05, 0.05],
-        modality_dist="uniform"
-    ),
-
-    Workload(
-        name="Mixed Modalities with Poisson 4.0",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3-4.0.jsonl"),
-        alias="mix-poisson-4.0",
-        arrival_dist="poisson",
-        modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.85, 0.05, 0.05, 0.05],
-        modality_dist="uniform"
-    ),
-
-    Workload(
-        name="Mixed Modalities with Poisson 4.5",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3-4.5.jsonl"),
-        alias="mix-poisson-4.5",
-        arrival_dist="poisson",
-        modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.85, 0.05, 0.05, 0.05],
-        modality_dist="uniform"
-    ),
-
-    Workload(
-        name="Mixed Modalities with Poisson 5.0",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3-5.0.jsonl"),
-        alias="mix-poisson-5.0",
-        arrival_dist="poisson",
-        modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.85, 0.05, 0.05, 0.05],
-        modality_dist="uniform"
-    ),
-
-    Workload(
-        name="Mixed Modalities with Poisson 5.5",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3-5.5.jsonl"),
-        alias="mix-poisson-5.5",
-        arrival_dist="poisson",
-        modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.85, 0.05, 0.05, 0.05],
-        modality_dist="uniform"
-    ),
-
-    Workload(
-        name="Mixed Modalities with Poisson 6.0",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3-6.0.jsonl"),
-        alias="mix-poisson-6.0",
-        arrival_dist="poisson",
-        modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.85, 0.05, 0.05, 0.05],
-        modality_dist="uniform"
-    ),
-
-    Workload(
-        name="Mixed Modalities with Poisson 6.5",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3-6.5.jsonl"),
-        alias="mix-poisson-6.5",
-        arrival_dist="poisson",
-        modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.85, 0.05, 0.05, 0.05],
-        modality_dist="uniform"
-    ),
-
-    Workload(
-        name="Mixed Modalities with Poisson 7.0",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3-7.0.jsonl"),
-        alias="mix-poisson-7.0",
-        arrival_dist="poisson",
-        modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.85, 0.05, 0.05, 0.05],
-        modality_dist="uniform"
-    ),
-
-    Workload(
-        name="Mixed Modalities with Poisson 7.5",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3-7.5.jsonl"),
-        alias="mix-poisson-7.5",
-        arrival_dist="poisson",
-        modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.85, 0.05, 0.05, 0.05],
-        modality_dist="uniform"
-    ),
-
-    Workload(
-        name="Mixed Modalities with Poisson 8.0",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3-8.0.jsonl"),
-        alias="mix-poisson-8.0",
-        arrival_dist="poisson",
-        modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.85, 0.05, 0.05, 0.05],
-        modality_dist="uniform"
-    ),
-
-    Workload(
-        name="Mixed Modalities with Poisson 8.5",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3-8.5.jsonl"),
-        alias="mix-poisson-8.5",
-        arrival_dist="poisson",
-        modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.85, 0.05, 0.05, 0.05],
-        modality_dist="uniform"
-    ),
-
-    Workload(
-        name="Mixed Modalities with Poisson 9.0",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3-9.0.jsonl"),
-        alias="mix-poisson-9.0",
-        arrival_dist="poisson",
-        modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.85, 0.05, 0.05, 0.05],
-        modality_dist="uniform"
-    ),
-
-    Workload(
-        name="Mixed Modalities with Poisson 9.5",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3-9.5.jsonl"),
-        alias="mix-poisson-9.5",
-        arrival_dist="poisson",
-        modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.85, 0.05, 0.05, 0.05],
-        modality_dist="uniform"
-    ),
-
-    Workload(
-        name="Mixed Modalities with Poisson 10.0",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3-10.0.jsonl"),
-        alias="mix-poisson-10.0",
-        arrival_dist="poisson",
-        modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.85, 0.05, 0.05, 0.05],
-        modality_dist="uniform"
-    ),
-
-    Workload(
-        name="Mixed Modalities with Poisson 15.0",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3-15.0.jsonl"),
-        alias="mix-poisson-15.0",
+        name="Mixed Modalities with Poisson 0.1 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-15"),
+        alias="mix-poisson-0.1-15",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.85, 0.05, 0.05, 0.05],
         modality_dist="uniform"
     ),
     Workload(
-        name="Mixed Modalities with Poisson 20.0",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3-20.0.jsonl"),
-        alias="mix-poisson-20.0",
+        name="Mixed Modalities with Poisson 0.5 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-15"),
+        alias="mix-poisson-0.5-15",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video", "audio"],
+        modality_pct=[0.85, 0.05, 0.05, 0.05],
+        modality_dist="uniform"
+    ),
+    Workload(
+        name="Mixed Modalities with Poisson 1.0 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-15"),
+        alias="mix-poisson-1.0-15",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video", "audio"],
+        modality_pct=[0.85, 0.05, 0.05, 0.05],
+        modality_dist="uniform"
+    ),
+    Workload(
+        name="Mixed Modalities with Poisson 1.5 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-15"),
+        alias="mix-poisson-1.5-15",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video", "audio"],
+        modality_pct=[0.85, 0.05, 0.05, 0.05],
+        modality_dist="uniform"
+    ),
+    Workload(
+        name="Mixed Modalities with Poisson 2.0 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-15"),
+        alias="mix-poisson-2.0-15",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video", "audio"],
+        modality_pct=[0.85, 0.05, 0.05, 0.05],
+        modality_dist="uniform"
+    ),
+    Workload(
+        name="Mixed Modalities with Poisson 2.5 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-15"),
+        alias="mix-poisson-2.5-15",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video", "audio"],
+        modality_pct=[0.85, 0.05, 0.05, 0.05],
+        modality_dist="uniform"
+    ),
+    Workload(
+        name="Mixed Modalities with Poisson 3.0 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-15"),
+        alias="mix-poisson-3.0-15",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video", "audio"],
+        modality_pct=[0.85, 0.05, 0.05, 0.05],
+        modality_dist="uniform"
+    ),
+    Workload(
+        name="Mixed Modalities with Poisson 3.5 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-15"),
+        alias="mix-poisson-3.5-15",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video", "audio"],
+        modality_pct=[0.85, 0.05, 0.05, 0.05],
+        modality_dist="uniform"
+    ),
+    Workload(
+        name="Mixed Modalities with Poisson 4.0 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-15"),
+        alias="mix-poisson-4.0-15",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video", "audio"],
+        modality_pct=[0.85, 0.05, 0.05, 0.05],
+        modality_dist="uniform"
+    ),
+    Workload(
+        name="Mixed Modalities with Poisson 4.5 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-15"),
+        alias="mix-poisson-4.5-15",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video", "audio"],
+        modality_pct=[0.85, 0.05, 0.05, 0.05],
+        modality_dist="uniform"
+    ),
+    Workload(
+        name="Mixed Modalities with Poisson 5.0 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-15"),
+        alias="mix-poisson-5.0-15",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video", "audio"],
+        modality_pct=[0.85, 0.05, 0.05, 0.05],
+        modality_dist="uniform"
+    ),
+    Workload(
+        name="Mixed Modalities with Poisson 5.5 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-15"),
+        alias="mix-poisson-5.5-15",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video", "audio"],
+        modality_pct=[0.85, 0.05, 0.05, 0.05],
+        modality_dist="uniform"
+    ),
+    Workload(
+        name="Mixed Modalities with Poisson 6.0 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-15"),
+        alias="mix-poisson-6.0-15",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video", "audio"],
+        modality_pct=[0.85, 0.05, 0.05, 0.05],
+        modality_dist="uniform"
+    ),
+    Workload(
+        name="Mixed Modalities with Poisson 6.5 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-15"),
+        alias="mix-poisson-6.5-15",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video", "audio"],
+        modality_pct=[0.85, 0.05, 0.05, 0.05],
+        modality_dist="uniform"
+    ),
+    Workload(
+        name="Mixed Modalities with Poisson 7.0 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-15"),
+        alias="mix-poisson-7.0-15",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video", "audio"],
+        modality_pct=[0.85, 0.05, 0.05, 0.05],
+        modality_dist="uniform"
+    ),
+    Workload(
+        name="Mixed Modalities with Poisson 7.5 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-15"),
+        alias="mix-poisson-7.5-15",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video", "audio"],
+        modality_pct=[0.85, 0.05, 0.05, 0.05],
+        modality_dist="uniform"
+    ),
+    Workload(
+        name="Mixed Modalities with Poisson 8.0 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-15"),
+        alias="mix-poisson-8.0-15",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video", "audio"],
+        modality_pct=[0.85, 0.05, 0.05, 0.05],
+        modality_dist="uniform"
+    ),
+    Workload(
+        name="Mixed Modalities with Poisson 8.5 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-15"),
+        alias="mix-poisson-8.5-15",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video", "audio"],
+        modality_pct=[0.85, 0.05, 0.05, 0.05],
+        modality_dist="uniform"
+    ),
+    Workload(
+        name="Mixed Modalities with Poisson 9.0 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-15"),
+        alias="mix-poisson-9.0-15",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video", "audio"],
+        modality_pct=[0.85, 0.05, 0.05, 0.05],
+        modality_dist="uniform"
+    ),
+    Workload(
+        name="Mixed Modalities with Poisson 9.5 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-15"),
+        alias="mix-poisson-9.5-15",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video", "audio"],
+        modality_pct=[0.85, 0.05, 0.05, 0.05],
+        modality_dist="uniform"
+    ),
+    Workload(
+        name="Mixed Modalities with Poisson 10.0 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-15"),
+        alias="mix-poisson-10.0-15",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.85, 0.05, 0.05, 0.05],
@@ -538,214 +485,193 @@ _WORKLOADS_MIX_POISSON_15 = {
 
 # Mixed Modalities with Poisson | Varying request rate | Top 30% replaced
 _WORKLOADS_MIX_POISSON_30 = {
-    #### Mixed Modalities with Poisson | Varying request rate 30 %
     Workload(
         name="Mixed Modalities with Poisson 0.1 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.30-0.1.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-30"),
         alias="mix-poisson-0.1-30",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.70, 0.1, 0.1, 0.1],
+        modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 0.5 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.30-0.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-30"),
         alias="mix-poisson-0.5-30",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.70, 0.1, 0.1, 0.1],
+        modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 1.0 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.30-1.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-30"),
         alias="mix-poisson-1.0-30",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.70, 0.1, 0.1, 0.1],
+        modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 1.5 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.30-1.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-30"),
         alias="mix-poisson-1.5-30",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.70, 0.1, 0.1, 0.1],
+        modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 2.0 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.30-2.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-30"),
         alias="mix-poisson-2.0-30",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.70, 0.1, 0.1, 0.1],
+        modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 2.5 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.30-2.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-30"),
         alias="mix-poisson-2.5-30",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.70, 0.1, 0.1, 0.1],
+        modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 3.0 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.30-3.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-30"),
         alias="mix-poisson-3.0-30",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.70, 0.1, 0.1, 0.1],
+        modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 3.5 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.30-3.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-30"),
         alias="mix-poisson-3.5-30",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.70, 0.1, 0.1, 0.1],
+        modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 4.0 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.30-4.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-30"),
         alias="mix-poisson-4.0-30",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.70, 0.1, 0.1, 0.1],
+        modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 4.5 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.30-4.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-30"),
         alias="mix-poisson-4.5-30",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.70, 0.1, 0.1, 0.1],
+        modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 5.0 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.30-5.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-30"),
         alias="mix-poisson-5.0-30",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.70, 0.1, 0.1, 0.1],
+        modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 5.5 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.30-5.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-30"),
         alias="mix-poisson-5.5-30",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.70, 0.1, 0.1, 0.1],
+        modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 6.0 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.30-6.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-30"),
         alias="mix-poisson-6.0-30",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.70, 0.1, 0.1, 0.1],
+        modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 6.5 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.30-6.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-30"),
         alias="mix-poisson-6.5-30",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.70, 0.1, 0.1, 0.1],
+        modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 7.0 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.30-7.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-30"),
         alias="mix-poisson-7.0-30",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.70, 0.1, 0.1, 0.1],
+        modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 7.5 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.30-7.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-30"),
         alias="mix-poisson-7.5-30",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.70, 0.1, 0.1, 0.1],
+        modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 8.0 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.30-8.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-30"),
         alias="mix-poisson-8.0-30",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.70, 0.1, 0.1, 0.1],
+        modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 8.5 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.30-8.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-30"),
         alias="mix-poisson-8.5-30",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.70, 0.1, 0.1, 0.1],
+        modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 9.0 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.30-9.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-30"),
         alias="mix-poisson-9.0-30",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.70, 0.1, 0.1, 0.1],
+        modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 9.5 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.30-9.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-30"),
         alias="mix-poisson-9.5-30",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.70, 0.1, 0.1, 0.1],
+        modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 10.0 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.30-10.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-30"),
         alias="mix-poisson-10.0-30",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
-        modality_pct=[0.70, 0.1, 0.1, 0.1],
+        modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     )
 }
@@ -754,207 +680,187 @@ _WORKLOADS_MIX_POISSON_30 = {
 _WORKLOADS_MIX_POISSON_45 = {
     Workload(
         name="Mixed Modalities with Poisson 0.1 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.45-0.1.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-45"),
         alias="mix-poisson-0.1-45",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 0.5 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.45-0.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-45"),
         alias="mix-poisson-0.5-45",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 1.0 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.45-1.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-45"),
         alias="mix-poisson-1.0-45",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 1.5 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.45-1.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-45"),
         alias="mix-poisson-1.5-45",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 2.0 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.45-2.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-45"),
         alias="mix-poisson-2.0-45",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 2.5 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.45-2.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-45"),
         alias="mix-poisson-2.5-45",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 3.0 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.45-3.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-45"),
         alias="mix-poisson-3.0-45",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 3.5 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.45-3.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-45"),
         alias="mix-poisson-3.5-45",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 4.0 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.45-4.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-45"),
         alias="mix-poisson-4.0-45",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 4.5 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.45-4.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-45"),
         alias="mix-poisson-4.5-45",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 5.0 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.45-5.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-45"),
         alias="mix-poisson-5.0-45",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 5.5 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.45-5.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-45"),
         alias="mix-poisson-5.5-45",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 6.0 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.45-6.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-45"),
         alias="mix-poisson-6.0-45",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 6.5 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.45-6.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-45"),
         alias="mix-poisson-6.5-45",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 7.0 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.45-7.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-45"),
         alias="mix-poisson-7.0-45",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 7.5 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.45-7.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-45"),
         alias="mix-poisson-7.5-45",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 8.0 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.45-8.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-45"),
         alias="mix-poisson-8.0-45",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 8.5 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.45-8.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-45"),
         alias="mix-poisson-8.5-45",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 9.0 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.45-9.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-45"),
         alias="mix-poisson-9.0-45",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 9.5 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.45-9.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-45"),
         alias="mix-poisson-9.5-45",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Poisson 10.0 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-poisson-v3.45-10.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-poisson-45"),
         alias="mix-poisson-10.0-45",
         arrival_dist="poisson",
         modalities=["text", "image", "video", "audio"],
@@ -967,7 +873,7 @@ _WORKLOADS_MIX_POISSON_45 = {
 _WORKLOADS_TEXT_GAMMA = {
     Workload(
         name="Text Conversations with Gamma 0.1",
-        path=os.path.join(WORKLOADS_DIR, "text-gamma-0.1.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-gamma"),
         alias="text-gamma-0.1",
         arrival_dist="gamma",
         modalities="text",
@@ -976,7 +882,7 @@ _WORKLOADS_TEXT_GAMMA = {
 
     Workload(
         name="Text Conversations with Gamma 0.5",
-        path=os.path.join(WORKLOADS_DIR, "text-gamma-0.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-gamma"),
         alias="text-gamma-0.5",
         arrival_dist="gamma",
         modalities="text",
@@ -985,7 +891,7 @@ _WORKLOADS_TEXT_GAMMA = {
 
     Workload(
         name="Text Conversations with Gamma 1.0",
-        path=os.path.join(WORKLOADS_DIR, "text-gamma-1.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-gamma"),
         alias="text-gamma-1.0",
         arrival_dist="gamma",
         modalities="text",
@@ -994,7 +900,7 @@ _WORKLOADS_TEXT_GAMMA = {
 
     Workload(
         name="Text Conversations with Gamma 1.5",
-        path=os.path.join(WORKLOADS_DIR, "text-gamma-1.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-gamma"),
         alias="text-gamma-1.5",
         arrival_dist="gamma",
         modalities="text",
@@ -1003,7 +909,7 @@ _WORKLOADS_TEXT_GAMMA = {
 
     Workload(
         name="Text Conversations with Gamma 2.0",
-        path=os.path.join(WORKLOADS_DIR, "text-gamma-2.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-gamma"),
         alias="text-gamma-2.0",
         arrival_dist="gamma",
         modalities="text",
@@ -1012,7 +918,7 @@ _WORKLOADS_TEXT_GAMMA = {
 
     Workload(
         name="Text Conversations with Gamma 2.5",
-        path=os.path.join(WORKLOADS_DIR, "text-gamma-2.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-gamma"),
         alias="text-gamma-2.5",
         arrival_dist="gamma",
         modalities="text",
@@ -1021,7 +927,7 @@ _WORKLOADS_TEXT_GAMMA = {
 
     Workload(
         name="Text Conversations with Gamma 3.0",
-        path=os.path.join(WORKLOADS_DIR, "text-gamma-3.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-gamma"),
         alias="text-gamma-3.0",
         arrival_dist="gamma",
         modalities="text",
@@ -1030,7 +936,7 @@ _WORKLOADS_TEXT_GAMMA = {
 
     Workload(
         name="Text Conversations with Gamma 3.5",
-        path=os.path.join(WORKLOADS_DIR, "text-gamma-3.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-gamma"),
         alias="text-gamma-3.5",
         arrival_dist="gamma",
         modalities="text",
@@ -1039,7 +945,7 @@ _WORKLOADS_TEXT_GAMMA = {
 
     Workload(
         name="Text Conversations with Gamma 4.0",
-        path=os.path.join(WORKLOADS_DIR, "text-gamma-4.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-gamma"),
         alias="text-gamma-4.0",
         arrival_dist="gamma",
         modalities="text",
@@ -1048,7 +954,7 @@ _WORKLOADS_TEXT_GAMMA = {
 
     Workload(
         name="Text Conversations with Gamma 4.5",
-        path=os.path.join(WORKLOADS_DIR, "text-gamma-4.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-gamma"),
         alias="text-gamma-4.5",
         arrival_dist="gamma",
         modalities="text",
@@ -1057,7 +963,7 @@ _WORKLOADS_TEXT_GAMMA = {
 
     Workload(
         name="Text Conversations with Gamma 5.0",
-        path=os.path.join(WORKLOADS_DIR, "text-gamma-5.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-gamma"),
         alias="text-gamma-5.0",
         arrival_dist="gamma",
         modalities="text",
@@ -1066,7 +972,7 @@ _WORKLOADS_TEXT_GAMMA = {
 
     Workload(
         name="Text Conversations with Gamma 5.5",
-        path=os.path.join(WORKLOADS_DIR, "text-gamma-5.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-gamma"),
         alias="text-gamma-5.5",
         arrival_dist="gamma",
         modalities="text",
@@ -1075,7 +981,7 @@ _WORKLOADS_TEXT_GAMMA = {
 
     Workload(
         name="Text Conversations with Gamma 6.0",
-        path=os.path.join(WORKLOADS_DIR, "text-gamma-6.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-gamma"),
         alias="text-gamma-6.0",
         arrival_dist="gamma",
         modalities="text",
@@ -1084,7 +990,7 @@ _WORKLOADS_TEXT_GAMMA = {
 
     Workload(
         name="Text Conversations with Gamma 6.5",
-        path=os.path.join(WORKLOADS_DIR, "text-gamma-6.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-gamma"),
         alias="text-gamma-6.5",
         arrival_dist="gamma",
         modalities="text",
@@ -1093,7 +999,7 @@ _WORKLOADS_TEXT_GAMMA = {
 
     Workload(
         name="Text Conversations with Gamma 7.0",
-        path=os.path.join(WORKLOADS_DIR, "text-gamma-7.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-gamma"),
         alias="text-gamma-7.0",
         arrival_dist="gamma",
         modalities="text",
@@ -1102,7 +1008,7 @@ _WORKLOADS_TEXT_GAMMA = {
 
     Workload(
         name="Text Conversations with Gamma 7.5",
-        path=os.path.join(WORKLOADS_DIR, "text-gamma-7.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-gamma"),
         alias="text-gamma-7.5",
         arrival_dist="gamma",
         modalities="text",
@@ -1111,7 +1017,7 @@ _WORKLOADS_TEXT_GAMMA = {
 
     Workload(
         name="Text Conversations with Gamma 8.0",
-        path=os.path.join(WORKLOADS_DIR, "text-gamma-8.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-gamma"),
         alias="text-gamma-8.0",
         arrival_dist="gamma",
         modalities="text",
@@ -1120,7 +1026,7 @@ _WORKLOADS_TEXT_GAMMA = {
 
     Workload(
         name="Text Conversations with Gamma 8.5",
-        path=os.path.join(WORKLOADS_DIR, "text-gamma-8.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-gamma"),
         alias="text-gamma-8.5",
         arrival_dist="gamma",
         modalities="text",
@@ -1129,7 +1035,7 @@ _WORKLOADS_TEXT_GAMMA = {
 
     Workload(
         name="Text Conversations with Gamma 9.0",
-        path=os.path.join(WORKLOADS_DIR, "text-gamma-9.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-gamma"),
         alias="text-gamma-9.0",
         arrival_dist="gamma",
         modalities="text",
@@ -1138,7 +1044,7 @@ _WORKLOADS_TEXT_GAMMA = {
 
     Workload(
         name="Text Conversations with Gamma 9.5",
-        path=os.path.join(WORKLOADS_DIR, "text-gamma-9.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-gamma"),
         alias="text-gamma-9.5",
         arrival_dist="gamma",
         modalities="text",
@@ -1147,7 +1053,7 @@ _WORKLOADS_TEXT_GAMMA = {
 
     Workload(
         name="Text Conversations with Gamma 10.0",
-        path=os.path.join(WORKLOADS_DIR, "text-gamma-10.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "text-gamma"),
         alias="text-gamma-10.0",
         arrival_dist="gamma",
         modalities="text",
@@ -1158,209 +1064,189 @@ _WORKLOADS_TEXT_GAMMA = {
 # Mixed Modalities with Gamma | Varying request rate | Top 15% replaced
 _WORKLOADS_MIX_GAMMA_15 = {
     Workload(
-        name="Mixed Modalities with Gamma 0.1",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3-0.1.jsonl"),
-        alias="mix-gamma-0.1",
+        name="Mixed Modalities with Gamma 0.1 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-15"),
+        alias="mix-gamma-0.1-15",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.85, 0.05, 0.05, 0.05],
         modality_dist="uniform"
     ),
-
     Workload(
-        name="Mixed Modalities with Gamma 0.5",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3-0.5.jsonl"),
-        alias="mix-gamma-0.5",
+        name="Mixed Modalities with Gamma 0.5 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-15"),
+        alias="mix-gamma-0.5-15",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.85, 0.05, 0.05, 0.05],
         modality_dist="uniform"
     ),
-
     Workload(
-        name="Mixed Modalities with Gamma 1.0",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3-1.0.jsonl"),
-        alias="mix-gamma-1.0",
+        name="Mixed Modalities with Gamma 1.0 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-15"),
+        alias="mix-gamma-1.0-15",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.85, 0.05, 0.05, 0.05],
         modality_dist="uniform"
     ),
-
     Workload(
-        name="Mixed Modalities with Gamma 1.5",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3-1.5.jsonl"),
-        alias="mix-gamma-1.5",
+        name="Mixed Modalities with Gamma 1.5 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-15"),
+        alias="mix-gamma-1.5-15",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.85, 0.05, 0.05, 0.05],
         modality_dist="uniform"
     ),
-
     Workload(
-        name="Mixed Modalities with Gamma 2.0",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3-2.0.jsonl"),
-        alias="mix-gamma-2.0",
+        name="Mixed Modalities with Gamma 2.0 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-15"),
+        alias="mix-gamma-2.0-15",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.85, 0.05, 0.05, 0.05],
         modality_dist="uniform"
     ),
-
     Workload(
-        name="Mixed Modalities with Gamma 2.5",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3-2.5.jsonl"),
-        alias="mix-gamma-2.5",
+        name="Mixed Modalities with Gamma 2.5 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-15"),
+        alias="mix-gamma-2.5-15",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.85, 0.05, 0.05, 0.05],
         modality_dist="uniform"
     ),
-
     Workload(
-        name="Mixed Modalities with Gamma 3.0",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3-3.0.jsonl"),
-        alias="mix-gamma-3.0",
+        name="Mixed Modalities with Gamma 3.0 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-15"),
+        alias="mix-gamma-3.0-15",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.85, 0.05, 0.05, 0.05],
         modality_dist="uniform"
     ),
-
     Workload(
-        name="Mixed Modalities with Gamma 3.5",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3-3.5.jsonl"),
-        alias="mix-gamma-3.5",
+        name="Mixed Modalities with Gamma 3.5 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-15"),
+        alias="mix-gamma-3.5-15",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.85, 0.05, 0.05, 0.05],
         modality_dist="uniform"
     ),
-
     Workload(
-        name="Mixed Modalities with Gamma 4.0",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3-4.0.jsonl"),
-        alias="mix-gamma-4.0",
+        name="Mixed Modalities with Gamma 4.0 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-15"),
+        alias="mix-gamma-4.0-15",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.85, 0.05, 0.05, 0.05],
         modality_dist="uniform"
     ),
-
     Workload(
-        name="Mixed Modalities with Gamma 4.5",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3-4.5.jsonl"),
-        alias="mix-gamma-4.5",
+        name="Mixed Modalities with Gamma 4.5 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-15"),
+        alias="mix-gamma-4.5-15",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.85, 0.05, 0.05, 0.05],
         modality_dist="uniform"
     ),
-
     Workload(
-        name="Mixed Modalities with Gamma 5.0",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3-5.0.jsonl"),
-        alias="mix-gamma-5.0",
+        name="Mixed Modalities with Gamma 5.0 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-15"),
+        alias="mix-gamma-5.0-15",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.85, 0.05, 0.05, 0.05],
         modality_dist="uniform"
     ),
-
     Workload(
-        name="Mixed Modalities with Gamma 5.5",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3-5.5.jsonl"),
-        alias="mix-gamma-5.5",
+        name="Mixed Modalities with Gamma 5.5 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-15"),
+        alias="mix-gamma-5.5-15",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.85, 0.05, 0.05, 0.05],
         modality_dist="uniform"
     ),
-
     Workload(
-        name="Mixed Modalities with Gamma 6.0",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3-6.0.jsonl"),
-        alias="mix-gamma-6.0",
+        name="Mixed Modalities with Gamma 6.0 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-15"),
+        alias="mix-gamma-6.0-15",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.85, 0.05, 0.05, 0.05],
         modality_dist="uniform"
     ),
-
     Workload(
-        name="Mixed Modalities with Gamma 6.5",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3-6.5.jsonl"),
-        alias="mix-gamma-6.5",
+        name="Mixed Modalities with Gamma 6.5 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-15"),
+        alias="mix-gamma-6.5-15",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.85, 0.05, 0.05, 0.05],
         modality_dist="uniform"
     ),
-
     Workload(
-        name="Mixed Modalities with Gamma 7.0",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3-7.0.jsonl"),
-        alias="mix-gamma-7.0",
+        name="Mixed Modalities with Gamma 7.0 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-15"),
+        alias="mix-gamma-7.0-15",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.85, 0.05, 0.05, 0.05],
         modality_dist="uniform"
     ),
-
     Workload(
-        name="Mixed Modalities with Gamma 7.5",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3-7.5.jsonl"),
-        alias="mix-gamma-7.5",
+        name="Mixed Modalities with Gamma 7.5 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-15"),
+        alias="mix-gamma-7.5-15",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.85, 0.05, 0.05, 0.05],
         modality_dist="uniform"
     ),
-
     Workload(
-        name="Mixed Modalities with Gamma 8.0",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3-8.0.jsonl"),
-        alias="mix-gamma-8.0",
+        name="Mixed Modalities with Gamma 8.0 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-15"),
+        alias="mix-gamma-8.0-15",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.85, 0.05, 0.05, 0.05],
         modality_dist="uniform"
     ),
-
     Workload(
-        name="Mixed Modalities with Gamma 8.5",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3-8.5.jsonl"),
-        alias="mix-gamma-8.5",
+        name="Mixed Modalities with Gamma 8.5 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-15"),
+        alias="mix-gamma-8.5-15",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.85, 0.05, 0.05, 0.05],
         modality_dist="uniform"
     ),
-
     Workload(
-        name="Mixed Modalities with Gamma 9.0",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3-9.0.jsonl"),
-        alias="mix-gamma-9.0",
+        name="Mixed Modalities with Gamma 9.0 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-15"),
+        alias="mix-gamma-9.0-15",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.85, 0.05, 0.05, 0.05],
         modality_dist="uniform"
     ),
-
     Workload(
-        name="Mixed Modalities with Gamma 9.5",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3-9.5.jsonl"),
-        alias="mix-gamma-9.5",
+        name="Mixed Modalities with Gamma 9.5 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-15"),
+        alias="mix-gamma-9.5-15",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.85, 0.05, 0.05, 0.05],
         modality_dist="uniform"
     ),
-
     Workload(
-        name="Mixed Modalities with Gamma 10.0",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3-10.0.jsonl"),
-        alias="mix-gamma-10.0",
+        name="Mixed Modalities with Gamma 10.0 15%",
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-15"),
+        alias="mix-gamma-10.0-15",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.85, 0.05, 0.05, 0.05],
@@ -1372,207 +1258,187 @@ _WORKLOADS_MIX_GAMMA_15 = {
 _WORKLOADS_MIX_GAMMA_30 = {
     Workload(
         name="Mixed Modalities with Gamma 0.1 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.30-0.1.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-30"),
         alias="mix-gamma-0.1-30",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 0.5 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.30-0.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-30"),
         alias="mix-gamma-0.5-30",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 1.0 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.30-1.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-30"),
         alias="mix-gamma-1.0-30",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 1.5 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.30-1.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-30"),
         alias="mix-gamma-1.5-30",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 2.0 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.30-2.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-30"),
         alias="mix-gamma-2.0-30",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 2.5 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.30-2.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-30"),
         alias="mix-gamma-2.5-30",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 3.0 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.30-3.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-30"),
         alias="mix-gamma-3.0-30",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 3.5 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.30-3.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-30"),
         alias="mix-gamma-3.5-30",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 4.0 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.30-4.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-30"),
         alias="mix-gamma-4.0-30",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 4.5 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.30-4.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-30"),
         alias="mix-gamma-4.5-30",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 5.0 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.30-5.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-30"),
         alias="mix-gamma-5.0-30",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 5.5 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.30-5.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-30"),
         alias="mix-gamma-5.5-30",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 6.0 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.30-6.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-30"),
         alias="mix-gamma-6.0-30",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 6.5 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.30-6.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-30"),
         alias="mix-gamma-6.5-30",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 7.0 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.30-7.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-30"),
         alias="mix-gamma-7.0-30",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 7.5 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.30-7.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-30"),
         alias="mix-gamma-7.5-30",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 8.0 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.30-8.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-30"),
         alias="mix-gamma-8.0-30",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 8.5 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.30-8.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-30"),
         alias="mix-gamma-8.5-30",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 9.0 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.30-9.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-30"),
         alias="mix-gamma-9.0-30",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 9.5 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.30-9.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-30"),
         alias="mix-gamma-9.5-30",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.7, 0.1, 0.1, 0.1],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 10.0 30%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.30-10.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-30"),
         alias="mix-gamma-10.0-30",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
@@ -1583,209 +1449,189 @@ _WORKLOADS_MIX_GAMMA_30 = {
 
 # Mixed Modalities with Gamma | Varying request rate | Top 45% replaced
 _WORKLOADS_MIX_GAMMA_45 = {
-    Workload(
+        Workload(
         name="Mixed Modalities with Gamma 0.1 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.45-0.1.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-45"),
         alias="mix-gamma-0.1-45",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 0.5 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.45-0.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-45"),
         alias="mix-gamma-0.5-45",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 1.0 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.45-1.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-45"),
         alias="mix-gamma-1.0-45",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 1.5 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.45-1.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-45"),
         alias="mix-gamma-1.5-45",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 2.0 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.45-2.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-45"),
         alias="mix-gamma-2.0-45",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 2.5 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.45-2.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-45"),
         alias="mix-gamma-2.5-45",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 3.0 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.45-3.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-45"),
         alias="mix-gamma-3.0-45",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 3.5 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.45-3.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-45"),
         alias="mix-gamma-3.5-45",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 4.0 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.45-4.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-45"),
         alias="mix-gamma-4.0-45",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 4.5 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.45-4.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-45"),
         alias="mix-gamma-4.5-45",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 5.0 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.45-5.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-45"),
         alias="mix-gamma-5.0-45",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 5.5 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.45-5.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-45"),
         alias="mix-gamma-5.5-45",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 6.0 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.45-6.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-45"),
         alias="mix-gamma-6.0-45",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 6.5 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.45-6.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-45"),
         alias="mix-gamma-6.5-45",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 7.0 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.45-7.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-45"),
         alias="mix-gamma-7.0-45",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 7.5 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.45-7.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-45"),
         alias="mix-gamma-7.5-45",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 8.0 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.45-8.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-45"),
         alias="mix-gamma-8.0-45",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 8.5 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.45-8.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-45"),
         alias="mix-gamma-8.5-45",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 9.0 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.45-9.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-45"),
         alias="mix-gamma-9.0-45",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 9.5 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.45-9.5.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-45"),
         alias="mix-gamma-9.5-45",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
         modality_pct=[0.55, 0.15, 0.15, 0.15],
         modality_dist="uniform"
     ),
-
     Workload(
         name="Mixed Modalities with Gamma 10.0 45%",
-        path=os.path.join(WORKLOADS_DIR, "mix-gamma-v3.45-10.0.jsonl"),
+        path=os.path.join(WORKLOADS_DIR, "mix-gamma-45"),
         alias="mix-gamma-10.0-45",
         arrival_dist="gamma",
         modalities=["text", "image", "video", "audio"],
