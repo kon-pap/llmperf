@@ -1,70 +1,31 @@
+# LLMPerf Inference Benchmark Suite
 
+LLMPerf Inference is a benchmark suite for measuring how fast systems can run MLLMs in a variety of deployment scenarios.
+
+## Installation
+
+1. Clone recursively
+2. Create virtual environemnt
+3. Install vllm (for image, video, audio)
+4. Install llmperf
 
 ## Datasets
 
-### Prompt Formatting
+Donwload datasets separately or download a minimal version provided by us
 
-There are different ways to structure the prompt of a dataset. Next, are some
-representative ways to do so:
+## Workloads
 
-#### Visual Q&A
+```
+python src/scripts/create_static_workloads.py # Create {text,image,video,audio}-static workloads from the datasets
+python src/scripts/create_poisson_workloads.py # Create {text,mix}-poisson workloads using static workloads
+python src/scripts/create_gamma_workloads.py # Create {text,mix}-gamma workloads using static workloads
+```
 
-1.  `<image> Question: <question> Answer:`
-    
-    Source: https://arxiv.org/pdf/2206.01718
+## Experiments
 
-2.  `<image> <question> Answer the question using a single word or phrase.`
-
-    Source: https://github.com/haotian-liu/LLaVA/blob/main/docs/Evaluation.md
-
-3. `<image> Based on the above image, please answer the question. <question> Please provide an accurate answer within one word. The answer is: `
-
-    Source: (Custom) https://arxiv.org/pdf/2401.10208
-
-#### Image Captioning
-
-1. `<image> Describe the image concisely.`
-
-    Source: https://arxiv.org/pdf/2304.08485
-
-2. `<image> Provide a one-sentence caption for the provided image.`
-
-    Source: https://arxiv.org/pdf/2401.10208
-
-#### Detailed Description
-
-1. `<image> Describe the following image in detail.`
-
-    Source: https://arxiv.org/pdf/2304.08485
-
-2. `<image> Please describe the image in detail.`
-
-    Source: https://arxiv.org/pdf/2401.10208
-
-#### Complex Reasoning
-
-1.  `<image> Question: <question> Answer:`
-    
-    Source: https://arxiv.org/pdf/2206.01718
-
-2. `<image> <question>`
-
-    Source: (No processing) https://github.com/haotian-liu/LLaVA/blob/main/docs/Evaluation.md
-
-#### Multiple-Choice Video Q&A
-
-#### Video Description
-
-#### Open-Ended Video Q&A
-
-#### Multi-Image Q&A
-
-#### Conversations
-
-Source: (No processing) https://github.com/haotian-liu/LLaVA/blob/main/docs/Evaluation.md
-
-#### Audio Understanding
-
-1. `<audio> Please describe this audio.`
-
-    Source: https://arxiv.org/pdf/2307.08581 (Fig. 8 - 13)
+```
+python src/scripts/run_static_workloads.py # Run static workloads in isolation
+python src/scripts/run_vllm_workloads.py # Run workloads in vllm
+python src/scripts/run_vllm_chunk_workloads.py # Run workloads in vllm with chunked prefill
+python src/scripts/run_mem_balloon_workloads.py # Run workloads in vllm with memory ballooning
+```
