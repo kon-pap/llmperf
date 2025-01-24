@@ -60,7 +60,7 @@ def get_model_by_name(name: str) -> Union[None, Model]:
             return model
     return None
 
-def get_model_by_name(alias: str) -> Union[None, Model]:
+def get_model_by_alias(alias: str) -> Union[None, Model]:
     for model in MODELS:
         if getattr(model, "alias", None) == alias:
             return model
