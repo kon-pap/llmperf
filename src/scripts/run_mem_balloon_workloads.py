@@ -1,5 +1,3 @@
-import json
-import os
 import time
 
 from datetime import datetime
@@ -9,8 +7,7 @@ from vllm import LLM, SamplingParams
 from src.config.approaches import get_approach_by_name
 from src.config.models import get_model_by_name
 from src.config.workloads import get_workload_by_name
-from src.constants import EXPERIMENTS_LOG, EXPERIMENTS_OUTPUTS_DIR
-from src.utils import load_output
+from src.postprocessing.output import RequestOutput, ExperimentOutput
 
 if __name__ == '__main__':
     START_TIME = datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -29,17 +26,21 @@ if __name__ == '__main__':
     model_names = ["Mistral-7b"] * len(workload_names)
 
     # Read static results and get modality tokens and output tokens
-    text_iso = load_output(os.path.join(EXPERIMENTS_OUTPUTS_DIR, "text-static-text-mistral-iso-20250107-125738.jsonl"))
-    image_iso = load_output(os.path.join(EXPERIMENTS_OUTPUTS_DIR, "image-static-image-mistral-iso-20250107-125738.jsonl"))
-    video_iso = load_output(os.path.join(EXPERIMENTS_OUTPUTS_DIR, "video-static-video-mistral-iso-20250107-222022.jsonl"))
-    audio_iso = load_output(os.path.join(EXPERIMENTS_OUTPUTS_DIR, "audio-static-audio-qwen-iso-20250107-210445.jsonl"))
+    text_iso = ExperimentOutput(id="text-static-text-mistral-iso-20250107-125738")
+    text_iso.load()
+    image_iso = ExperimentOutput(id="image-static-image-mistral-iso-20250107-125738")
+    image_iso.load()
+    video_iso = ExperimentOutput(id="video-static-video-mistral-iso-20250107-222022")
+    video_iso.load()
+    audio_iso = ExperimentOutput(id="audio-static-audio-qwen-iso-20250107-210445")
+    audio_iso.load()
 
-    text_id_pool = { o["id"] for o in text_iso }
-    image_id_pool = { o["id"] for o in image_iso }
-    video_id_pool = { o["id"] for o in video_iso }
-    audio_id_pool = { o["id"] for o in audio_iso }
+    text_id_pool = { o.id for o in text_iso.request_outputs }
+    image_id_pool = { o.id for o in image_iso.request_outputs }
+    video_id_pool = { o.id for o in video_iso.request_outputs }
+    audio_id_pool = { o.id for o in audio_iso.request_outputs }
 
-    iso_outputs = {o["id"]: o for o in text_iso + image_iso + video_iso + audio_iso}
+    iso_outputs = { o.id: o for o in text_iso.request_outputs + image_iso.request_outputs + video_iso.request_outputs + audio_iso.request_outputs }
     
     for workload_name, model_name in zip(workload_names, model_names):
         try:
@@ -78,16 +79,16 @@ if __name__ == '__main__':
 
                         sampling_params = SamplingParams(
                             ignore_eos=True,
-                            max_tokens=iso_outputs[request.id]["decode_tokens_cnt"]
+                            max_tokens=iso_outputs[request.id].decode_tokens_cnt
                         )
 
                         # Create a replacement prompt of equal length
-                        replacement_prompt = " ".join("A" * (iso_outputs[request.id]["prompt_tokens_cnt"]-1))
+                        replacement_prompt = " ".join("A" * (iso_outputs[request.id].prompt_tokens_cnt-1))
 
                         # Add the overhead based on the modality
                         overhead = 0.0
                         if request.id not in text_id_pool:
-                            overhead = iso_outputs[request.id]["processor_time"] + iso_outputs[request.id]["encoder_time"]
+                            overhead = iso_outputs[request.id].processor_time + iso_outputs[request.id].encoder_time
 
                         llm.llm_engine.add_request(
                             request_id=request_id,
@@ -109,57 +110,40 @@ if __name__ == '__main__':
                         if original_request_id in text_id_pool:
                             modality_tokens_cnt = 0
                         else:
-                            modality_tokens_cnt = iso_outputs[original_request_id]["modality_tokens_cnt"]
+                            modality_tokens_cnt = iso_outputs[original_request_id].modality_tokens_cnt
                         
-                        outputs.append({
-                            "id": original_request_id,
-                            "prompt_tokens_cnt": len(req_output.prompt_token_ids),
-                            "modality_tokens_cnt": modality_tokens_cnt,
-                            "decode_tokens_cnt": len(req_output.outputs[0].token_ids),
-                            "processor_time": req_output.metrics.processor_time,
-                            "encoder_time": req_output.metrics.encoder_time if req_output.metrics.encoder_time else 0,
-                            "ttft": req_output.metrics.first_token_time - req_output.metrics.first_scheduled_time,
-                            "tbt": 0 if len(req_output.outputs[0].token_ids) <= 1 else (req_output.metrics.finished_time - req_output.metrics.first_token_time) / (len(req_output.outputs[0].token_ids)-1),
-                            "e2e": req_output.metrics.finished_time - req_output.metrics.first_scheduled_time,
-                            
-                            "arrival_time": req_output.metrics.arrival_time,
-                            "last_token_time": req_output.metrics.last_token_time,
-                            "first_scheduled_time": req_output.metrics.first_scheduled_time,
-                            "first_token_time": req_output.metrics.first_token_time,
-                            "time_in_queue": req_output.metrics.time_in_queue,
-                            "finished_time": req_output.metrics.finished_time,
-                            "scheduler_time": req_output.metrics.scheduler_time,
-                            "model_forward_time": req_output.metrics.model_forward_time,
-                            "model_execute_time": req_output.metrics.model_execute_time
-                        })
+                        outputs.append(
+                            RequestOutput(
+                                id=original_request_id,
+                                prompt_tokens_cnt=len(req_output.prompt_token_ids),
+                                modality_tokens_cnt=modality_tokens_cnt,
+                                decode_tokens_cnt=len(req_output.outputs[0].token_ids),
+                                processor_time=req_output.metrics.processor_time,
+                                encoder_time=req_output.metrics.encoder_time if req_output.metrics.encoder_time else 0,
+                                ttft=req_output.metrics.first_token_time - req_output.metrics.first_scheduled_time,
+                                tbt=0 if len(req_output.outputs[0].token_ids) <= 1 else (req_output.metrics.finished_time - req_output.metrics.first_token_time) / (len(req_output.outputs[0].token_ids)-1),
+                                e2e=req_output.metrics.finished_time - req_output.metrics.first_scheduled_time,
+                                arrival_time=req_output.metrics.arrival_time,
+                                last_token_time=req_output.metrics.last_token_time,
+                                first_scheduled_time=req_output.metrics.first_scheduled_time,
+                                first_token_time=req_output.metrics.first_token_time,
+                                time_in_queue=req_output.metrics.time_in_queue,
+                                finished_time=req_output.metrics.finished_time,
+                                scheduler_time=req_output.metrics.scheduler_time,
+                                model_forward_time=req_output.metrics.model_forward_time,
+                                model_execute_time=req_output.metrics.model_execute_time
+                            )
+                        )
                         pbar.update(1)
         finally:
             pbar.close()
             elapsed_time = now - start_time
 
-            total_num_tokens = 0
-            for output in outputs:
-                prompt_tokens_cnt = output["prompt_tokens_cnt"]
-                decode_tokens_cnt = output["decode_tokens_cnt"]
-
-                total_num_tokens += prompt_tokens_cnt + decode_tokens_cnt
-    
-            system_output = {
-                "id": f"{workload.alias}-{model.alias}-{approach.alias}-{START_TIME}",
-                "elapsed_time": elapsed_time,
-                "num_requests": len(outputs),
-                "total_num_tokens": total_num_tokens,
-                "requests_per_second": len(outputs) / elapsed_time,
-                "tokens_per_second": total_num_tokens / elapsed_time
-            }
-
-            file = f"{workload.alias}-{model.alias}-{approach.alias}-{START_TIME}.jsonl"
-            path = os.path.join(EXPERIMENTS_OUTPUTS_DIR, file)
-            with open(path, "w", encoding="utf-8") as file:
-                for output in outputs:
-                    file.write(json.dumps(output) + "\n")
-
-            with open(EXPERIMENTS_LOG, "a", encoding="utf-8") as file:
-                file.write(json.dumps(system_output) + "\n")
+            experiment_output = ExperimentOutput(
+                id=f"{workload.alias}-{model.alias}-{approach.alias}-{START_TIME}",
+                elapsed_time=elapsed_time,
+                request_outputs=outputs
+            )
+            experiment_output.save()
             
             llm = None
