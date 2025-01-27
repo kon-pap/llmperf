@@ -1,5 +1,3 @@
-import json
-import os
 import time
 
 from datetime import datetime
@@ -12,7 +10,7 @@ from vllm.assets.video import VideoAsset
 from src.config.approaches import get_approach_by_name
 from src.config.models import get_model_by_name
 from src.config.workloads import get_workload_by_name
-from src.constants import EXPERIMENTS_LOG, EXPERIMENTS_OUTPUTS_DIR
+from src.postprocessing.output import RequestOutput, ExperimentOutput
 from src.utils import load_image
 
 if __name__ == '__main__':
@@ -164,54 +162,37 @@ if __name__ == '__main__':
                 )[0]
 
                 now = time.time()
-                outputs.append({
-                    "id": request.id,
-                    "prompt_tokens_cnt": len(req_output.prompt_token_ids),
-                    "modality_tokens_cnt": req_output.prompt_token_ids.count(modality_token_index),
-                    "decode_tokens_cnt": len(req_output.outputs[0].token_ids),
-                    "processor_time": req_output.metrics.processor_time,
-                    "encoder_time": req_output.metrics.encoder_time if req_output.metrics.encoder_time else 0,
-                    "ttft": req_output.metrics.first_token_time - req_output.metrics.first_scheduled_time,
-                    "tbt": 0 if len(req_output.outputs[0].token_ids) <= 1 else (req_output.metrics.finished_time - req_output.metrics.first_token_time) / (len(req_output.outputs[0].token_ids)-1),
-                    "e2e": req_output.metrics.finished_time - req_output.metrics.first_scheduled_time,
-                            
-                    "arrival_time": req_output.metrics.arrival_time,
-                    "last_token_time": req_output.metrics.last_token_time,
-                    "first_scheduled_time": req_output.metrics.first_scheduled_time,
-                    "first_token_time": req_output.metrics.first_token_time,
-                    "time_in_queue": req_output.metrics.time_in_queue,
-                    "finished_time": req_output.metrics.finished_time,
-                    "scheduler_time": req_output.metrics.scheduler_time,
-                    "model_forward_time": req_output.metrics.model_forward_time,
-                    "model_execute_time": req_output.metrics.model_execute_time
-                })
+                outputs.append(
+                    RequestOutput(
+                        id=request.id,
+                        prompt_tokens_cnt=len(req_output.prompt_token_ids),
+                        modality_tokens_cnt=req_output.prompt_token_ids.count(modality_token_index),
+                        decode_tokens_cnt=len(req_output.outputs[0].token_ids),
+                        processor_time=req_output.metrics.processor_time,
+                        encoder_time=req_output.metrics.encoder_time if req_output.metrics.encoder_time else 0,
+                        ttft=req_output.metrics.first_token_time - req_output.metrics.first_scheduled_time,
+                        tbt=0 if len(req_output.outputs[0].token_ids) <= 1 else (req_output.metrics.finished_time - req_output.metrics.first_token_time) / (len(req_output.outputs[0].token_ids)-1),
+                        e2e=req_output.metrics.finished_time - req_output.metrics.first_scheduled_time,
+                        arrival_time=req_output.metrics.arrival_time,
+                        last_token_time=req_output.metrics.last_token_time,
+                        first_scheduled_time=req_output.metrics.first_scheduled_time,
+                        first_token_time=req_output.metrics.first_token_time,
+                        time_in_queue=req_output.metrics.time_in_queue,
+                        finished_time=req_output.metrics.finished_time,
+                        scheduler_time=req_output.metrics.scheduler_time,
+                        model_forward_time=req_output.metrics.model_forward_time,
+                        model_execute_time=req_output.metrics.model_execute_time
+                    )
+                )
 
         finally:
             elapsed_time = now - start_time
 
-            total_num_tokens = 0
-            for output in outputs:
-                prompt_tokens_cnt = output["prompt_tokens_cnt"]
-                decode_tokens_cnt = output["decode_tokens_cnt"]
+            experiment_output = ExperimentOutput(
+                id=f"{workload.alias}-{model.alias}-{approach.alias}-{START_TIME}",
+                elapsed_time=elapsed_time,
+                request_outputs=outputs
+            )
+            experiment_output.save()
 
-                total_num_tokens += prompt_tokens_cnt + decode_tokens_cnt
-    
-            system_output = {
-                "id": f"{workload.alias}-{model.alias}-{approach.alias}-{START_TIME}",
-                "elapsed_time": elapsed_time,
-                "num_requests": len(outputs),
-                "total_num_tokens": total_num_tokens,
-                "requests_per_second": len(outputs) / elapsed_time,
-                "tokens_per_second": total_num_tokens / elapsed_time
-            }
-
-            file = f"{workload.alias}-{model.alias}-{approach.alias}-{START_TIME}.jsonl"
-            path = os.path.join(EXPERIMENTS_OUTPUTS_DIR, file)
-            with open(path, "w", encoding="utf-8") as file:
-                for output in outputs:
-                    file.write(json.dumps(output) + "\n")
-
-            with open(EXPERIMENTS_LOG, "a", encoding="utf-8") as file:
-                file.write(json.dumps(system_output) + "\n")
-            
             llm = None
