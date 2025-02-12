@@ -4,10 +4,52 @@ LLMPerf Inference is a benchmark suite for measuring how fast systems can run ML
 
 ## Installation
 
-1. Clone recursively
+To install pyenv:
+```
+curl -fsSL https://pyenv.run | bash
+
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+echo 'eval "$(pyenv init - bash)"' >> ~/.bashrc
+
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile
+echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile
+echo 'eval "$(pyenv init - bash)"' >> ~/.profile
+
+echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
+
+exec "$SHELL"
+```
+1. Clone repositories
+    ```
+    git clone git@gitlab.software.imdea.org:muse-lab/mllm-inference-workload-eval.git
+    cd mllm-inference-workload-eval/
+    git clone git@gitlab.software.imdea.org:muse-lab/vllm.git
+    cd vllm/
+    git checkout dev
+    ```
 2. Create virtual environemnt
+    ```
+    pyenv install 3.12.8
+    pyenv virtualenv 3.12.8 vllm-v0.7.2
+    ```
 3. Install vllm (for image, video, audio)
+    ```
+    VLLM_USE_PRECOMPILED=1 pip install --editable .
+    ```
 4. Install llmperf
+    ```
+    cd ..
+    pip install --editable .
+    ```
+
+Remember to check the contributing guide for vLLM!
+```
+cd vllm
+pip install -r requirements-dev.txt
+pre-commit install --hook-type pre-commit --hook-type commit-msg
+pre-commit run --all-files
+```
 
 ## Datasets
 
@@ -16,16 +58,16 @@ Donwload datasets separately or download a minimal version provided by us
 ## Workloads
 
 ```
-python src/scripts/create_static_workloads.py # Create {text,image,video,audio}-static workloads from the datasets
-python src/scripts/create_poisson_workloads.py # Create {text,mix}-poisson workloads using static workloads
-python src/scripts/create_gamma_workloads.py # Create {text,mix}-gamma workloads using static workloads
+python scripts/create_static_workloads.py # Create {text,image,video,audio}-static workloads from the datasets
+python scripts/create_poisson_workloads.py # Create {text,mix}-poisson workloads using static workloads
+python scripts/create_gamma_workloads.py # Create {text,mix}-gamma workloads using static workloads
 ```
 
 ## Experiments
 
 ```
-python src/scripts/run_static_workloads.py # Run static workloads in isolation
-python src/scripts/run_vllm_workloads.py # Run workloads in vllm
-python src/scripts/run_vllm_chunk_workloads.py # Run workloads in vllm with chunked prefill
-python src/scripts/run_mem_balloon_workloads.py # Run workloads in vllm with memory ballooning
+python scripts/run_static_workloads.py # Run static workloads in isolation
+python scripts/run_vllm_workloads.py # Run workloads in vllm
+python scripts/run_vllm_chunk_workloads.py # Run workloads in vllm with chunked prefill
+python scripts/run_mem_balloon_workloads.py # Run workloads in vllm with memory ballooning
 ```

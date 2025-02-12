@@ -7,11 +7,11 @@ from vllm import LLM, SamplingParams
 from vllm.assets.audio import AudioAsset
 from vllm.assets.video import VideoAsset
 
-from src.config.approaches import get_approach_by_name
-from src.config.models import get_model_by_name
-from src.config.workloads import get_workload_by_name
-from src.postprocessing.output import RequestOutput, ExperimentOutput
-from src.utils import load_image
+from llmperf.config.approaches import get_approach_by_name
+from llmperf.config.models import get_model_by_name
+from llmperf.config.workloads import get_workload_by_name
+from llmperf.postprocessing.output import RequestOutput, ExperimentOutput
+from llmperf.utils import load_image
 
 if __name__ == '__main__':
     START_TIME = datetime.now().strftime("%Y%m%d-%H%M%S")

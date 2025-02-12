@@ -4,18 +4,20 @@ from datetime import datetime
 from tqdm import tqdm
 from vllm import LLM, SamplingParams
 
-from src.config.approaches import get_approach_by_name
-from src.config.models import get_model_by_name
-from src.config.workloads import get_workload_by_name
-from src.postprocessing.output import RequestOutput, ExperimentOutput
+from llmperf.config.approaches import get_approach_by_name
+from llmperf.config.models import get_model_by_name
+from llmperf.config.workloads import get_workload_by_name
+from llmperf.postprocessing.output import RequestOutput, ExperimentOutput
 
 if __name__ == '__main__':
     START_TIME = datetime.now().strftime("%Y%m%d-%H%M%S")
 
     GPU_UTIL = 0.95
     SWAP_SPACE = 0
-    approach = get_approach_by_name("Vanilla vLLM")
+    approach = get_approach_by_name("Memory Ballooning")
 
+    MAX_NUM_BATCHED_TOKENS=2048
+    
     workload_names = [
         "Text Conversations with Poisson 0.5",
         "Mixed Modalities with Poisson 0.5 15%"
@@ -50,7 +52,8 @@ if __name__ == '__main__':
                 swap_space=SWAP_SPACE,
                 scheduling_policy=approach.scheduling_policy,
                 enable_custom_scheduler=approach.enable_custom_scheduler,
-                enable_chunked_prefill=approach.enable_chunked_prefill
+                enable_chunked_prefill=approach.enable_chunked_prefill,
+                max_num_batched_tokens=MAX_NUM_BATCHED_TOKENS
             )
 
             workload = get_workload_by_name(workload_name)
@@ -142,5 +145,5 @@ if __name__ == '__main__':
                 request_outputs=outputs
             )
             experiment_output.save()
-
+            
             llm = None

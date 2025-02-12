@@ -3,7 +3,7 @@ import os
 from dataclasses import dataclass
 from typing import LiteralString, Optional, Union
 
-from src.constants import MODELS_DIR
+from llmperf.constants import MODELS_DIR
 
 @dataclass
 class Model:
@@ -26,7 +26,7 @@ class Model:
 MODELS = {
     Model(
         name="Mistral-7b",
-        path="mistralai/Mistral-7B-Instruct-v0.2", # os.path.join(MODELS_DIR, "Mistral-7B-Instruct-v0.2")
+        path=os.path.join(MODELS_DIR, "Mistral-7B-Instruct-v0.2"),
         max_model_len=32768,
         alias="text-mistral"
     ),

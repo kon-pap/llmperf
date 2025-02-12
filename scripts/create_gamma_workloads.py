@@ -4,10 +4,10 @@ import random
 
 from transformers import AutoTokenizer
 
-from src.config.models import get_model_by_name
-from src.config.workloads import Request, Workload
-from src.config.workloads import get_workload_by_name
-from src.constants import WORKLOADS_DIR
+from llmperf.config.models import get_model_by_name
+from llmperf.config.workloads import Request, Workload
+from llmperf.config.workloads import get_workload_by_name
+from llmperf.constants import WORKLOADS_DIR
 
 GAMMA_PARAMS = {
         ## ! Keep shape = 0.5 based on BurstGPT paper

@@ -4,11 +4,11 @@ import os
 from dataclasses import dataclass, field
 from typing import Callable, Dict, List, LiteralString, Optional, Tuple, Union
 
-from src.constants import DATASETS_DIR
-from src.preprocessing.input import get_clotho_input, get_llava_image_reasoning_input, get_llava_video_description_input, get_sharegpt_input
-from src.preprocessing.output import get_clotho_output, get_llava_image_reasoning_output, get_llava_video_description_output, get_sharegpt_output
-from src.preprocessing.modality_path import get_clotho_audio_path, get_llava_image_path, get_llava_video_path
-from src.preprocessing.modality_size import get_audio_size, get_image_size, get_video_size
+from llmperf.constants import DATASETS_DIR
+from llmperf.preprocessing.input import get_clotho_input, get_llava_image_reasoning_input, get_llava_video_description_input, get_sharegpt_input
+from llmperf.preprocessing.output import get_clotho_output, get_llava_image_reasoning_output, get_llava_video_description_output, get_sharegpt_output
+from llmperf.preprocessing.modality_path import get_clotho_audio_path, get_llava_image_path, get_llava_video_path
+from llmperf.preprocessing.modality_size import get_audio_size, get_image_size, get_video_size
 
 @dataclass
 class Dataset:

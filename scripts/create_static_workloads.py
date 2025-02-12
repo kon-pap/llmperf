@@ -1,8 +1,8 @@
 import os
 
-from src.constants import WORKLOADS_DIR
-from src.config.datasets import get_dataset_by_name
-from src.config.workloads import Request, Workload
+from llmperf.constants import WORKLOADS_DIR
+from llmperf.config.datasets import get_dataset_by_name
+from llmperf.config.workloads import Request, Workload
 
 if __name__ == '__main__':
     names = [

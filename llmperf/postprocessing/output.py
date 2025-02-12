@@ -4,7 +4,7 @@ import os
 from dataclasses import asdict, dataclass, field
 from typing import List, LiteralString, Optional, Union
 
-from src.constants import EXPERIMENTS_LOG, EXPERIMENTS_OUTPUTS_DIR
+from llmperf.constants import EXPERIMENTS_LOG, EXPERIMENTS_OUTPUTS_DIR
 
 @dataclass
 class RequestOutput:

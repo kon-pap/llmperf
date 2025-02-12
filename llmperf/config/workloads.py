@@ -5,7 +5,7 @@ import os
 from dataclasses import asdict, dataclass, field
 from typing import List, Literal, LiteralString, Optional, Tuple, Union
 
-from src.constants import WORKLOADS_DIR
+from llmperf.constants import WORKLOADS_DIR
 
 @dataclass
 class Request:
