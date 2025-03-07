@@ -108,7 +108,7 @@ if __name__ == '__main__':
                             "role": "user",
                             "content": [
                                 {"type": "video"},
-                                {"type": "text", "text": request.input}
+                                {"type": "text", "text": "<video>\n" + request.input}
                             ]
                         }
                     ]
