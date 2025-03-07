@@ -3,7 +3,7 @@ import json
 import os
 
 from dataclasses import asdict, dataclass, field
-from typing import List, Literal, LiteralString, Optional, Tuple, Union
+from typing import Dict, List, Literal, LiteralString, Optional, Union
 
 from llmperf.constants import WORKLOADS_DIR
 
@@ -17,7 +17,7 @@ class Request:
     # multi image size: [(w0, h0), (w1, h1), ...]
     # video size: duration in sec
     # audio size: duration in sec
-    modality_size: Optional[Union[int,Tuple[int,int],List[Tuple[int,int]]]] = None
+    modality_size: Optional[Dict] = field(default_factory=dict)
 
     def __post_init__(self): 
         if not self.id:

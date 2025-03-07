@@ -21,12 +21,12 @@ class Dataset:
     get_input: Callable[[Optional[Dict]], Optional[str]] = field(default=None)
     get_output: Callable[[Dict], Optional[str]] = field(default=None)
     _get_modality_path: Callable[[Union[str,LiteralString],Dict], Union[str,LiteralString]] = field(default=None)
-    _get_modality_size: Callable[[Union[str,LiteralString],Dict], Union[int,Tuple[int,int],List[Tuple[int,int]]]] = field(default=None)
+    _get_modality_size: Callable[[Union[str,LiteralString],Dict], Dict] = field(default=None)
 
     def get_modality_path(self, record: Dict) -> Union[str,LiteralString]:
         return self._get_modality_path(self.path, record)
 
-    def get_modality_size(self, record: Dict) -> Union[int,Tuple[int,int],List[Tuple[int,int]]]:
+    def get_modality_size(self, record: Dict) -> Dict:
         return self._get_modality_size(self.path, record)
 
     def __hash__(self):
