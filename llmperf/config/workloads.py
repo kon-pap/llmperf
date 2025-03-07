@@ -33,7 +33,7 @@ class Workload:
     alias: str
     modalities: Union[str, List[str]]
     modality_pct: Union[float, List[float]]
-    modality_dist: Optional[Literal["uniform"]] = None
+    modality_dist: Optional[Literal["uniform", "categorical"]] = None
     arrival_dist: Optional[Literal["poisson", "bursgpt", "gamma"]] = None
 
     requests: Optional[List[Request]] = field(default_factory=list)
@@ -1640,6 +1640,31 @@ _WORKLOADS_MIX_GAMMA_45 = {
     )
 }
 
+_WORKLOADS_RPS_POISSON_60_30_10 = {
+    Workload(
+        name=f"Rock - Pebbles - Sand with Poisson {rate} 60%-30%-10%",
+        path=os.path.join(WORKLOADS_DIR, "rps-poisson-60-30-10"),
+        alias=f"rps-poisson-{rate}-60-30-10",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video"],
+        modality_pct=[0.6, 0.3, 0.1],
+        modality_dist="categorical"
+    )
+    for rate in [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
+}
+_WORKLOADS_RPS_POISSON_45_35_20 = {
+    Workload(
+        name=f"Rock - Pebbles - Sand with Poisson {rate} 45%-35%-20%",
+        path=os.path.join(WORKLOADS_DIR, "rps-poisson-45-35-20"),
+        alias=f"rps-poisson-{rate}-45-35-20",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video"],
+        modality_pct=[0.6, 0.3, 0.1],
+        modality_dist="categorical"
+    )
+    for rate in [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
+}
+
 WORKLOADS = _WORKLOADS_STATIC | \
     _WORKLOADS_TEXT_POISSON | \
     _WORKLOADS_MIX_POISSON_15 | \
@@ -1648,7 +1673,9 @@ WORKLOADS = _WORKLOADS_STATIC | \
     _WORKLOADS_TEXT_GAMMA | \
     _WORKLOADS_MIX_GAMMA_15 | \
     _WORKLOADS_MIX_GAMMA_30 | \
-    _WORKLOADS_MIX_GAMMA_45
+    _WORKLOADS_MIX_GAMMA_45 | \
+    _WORKLOADS_RPS_POISSON_60_30_10 | \
+    _WORKLOADS_RPS_POISSON_45_35_20
 
 def get_workload_by_name(name: str) -> Union[None, Workload]:
     for workload in WORKLOADS:
