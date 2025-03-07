@@ -32,6 +32,7 @@ exec "$SHELL"
     ```
     pyenv install 3.12.8
     pyenv virtualenv 3.12.8 vllm-v0.7.2
+    pyenv activate vllm-v0.7.2
     ```
 3. Install vllm (for image, video, audio)
     ```
