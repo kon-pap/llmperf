@@ -51,7 +51,39 @@ MODELS = {
         max_model_len=8192,
         alias="audio-qwen",
         audio_token_index=151646
-    )
+    ),
+    Model(
+        name="LLaVA-Onevision-7b",
+        path="llava-hf/llava-onevision-qwen2-7b-ov-chat-hf",
+        max_model_len=32768,
+        alias="llava-ov",
+        image_token_index=151646,
+        video_token_index=151647
+    ),
+    Model(
+        name="LLaVA-Onevision-500M",
+        path="llava-hf/llava-onevision-qwen2-0.5b-ov-hf",
+        max_model_len=32768,
+        alias="llava-ov-small",
+        image_token_index=151646,
+        video_token_index=151647
+    ),
+    Model(
+        name="Qwen2.5-7B",
+        path="Qwen/Qwen2.5-VL-7B-Instruct",
+        max_model_len=128000,
+        alias="qwen-2.5",
+        image_token_index=151655,
+        video_token_index=151656
+    ),
+    Model(
+        name="Qwen2.5-3B",
+        path="Qwen/Qwen2.5-VL-3B-Instruct",
+        max_model_len=128000,
+        alias="qwen-2.5-small",
+        image_token_index=151655,
+        video_token_index=151656
+    ),
 }
 
 def get_model_by_name(name: str) -> Union[None, Model]:
