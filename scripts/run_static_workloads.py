@@ -1,7 +1,7 @@
 import time
 
 from datetime import datetime
-from transformers import AutoProcessor, AutoTokenizer, LlavaNextProcessor, LlavaNextVideoProcessor
+from transformers import AutoProcessor, AutoTokenizer
 from tqdm import tqdm
 from vllm import LLM, SamplingParams
 from vllm.assets.audio import AudioAsset
@@ -55,9 +55,9 @@ if __name__ == '__main__':
             outputs = []
             modality_token_index = -1
             start_time = time.time()
-            for request in tqdm(requests):    
+            for request in tqdm(requests):
                 tokenizer = AutoTokenizer.from_pretrained(model.path)
-                output_length = len(tokenizer.encode(request.output)[1:])
+                output_length = len(tokenizer.encode(request.output))
 
                 sampling_params = SamplingParams(
                     ignore_eos=True,
@@ -77,7 +77,7 @@ if __name__ == '__main__':
 
                 if workload.alias == "image-static":
                     modality_token_index = model.image_token_index
-                    processor = LlavaNextProcessor.from_pretrained(model.path)
+                    processor = AutoProcessor.from_pretrained(model.path)
                     prompt = [
                         {
                             "role": "user",
@@ -102,13 +102,13 @@ if __name__ == '__main__':
 
                 if workload.alias == "video-static":
                     modality_token_index = model.video_token_index
-                    processor = LlavaNextVideoProcessor.from_pretrained(model.path)
+                    processor = AutoProcessor.from_pretrained(model.path)
                     prompt = [
                         {
                             "role": "user",
                             "content": [
                                 {"type": "video"},
-                                {"type": "text", "text": "<video>\n" + request.input}
+                                {"type": "text", "text": request.input}
                             ]
                         }
                     ]
@@ -156,32 +156,15 @@ if __name__ == '__main__':
                     }
 
                 req_output = llm.generate(
-                    final_prompt,
-                    sampling_params,
+                    prompts=[final_prompt],
+                    sampling_params=sampling_params,
                     use_tqdm=False
                 )[0]
 
                 now = time.time()
                 outputs.append(
-                    RequestOutput(
-                        id=request.id,
-                        prompt_tokens_cnt=len(req_output.prompt_token_ids),
-                        modality_tokens_cnt=req_output.prompt_token_ids.count(modality_token_index),
-                        decode_tokens_cnt=len(req_output.outputs[0].token_ids),
-                        processor_time=req_output.metrics.processor_time,
-                        encoder_time=req_output.metrics.encoder_time if req_output.metrics.encoder_time else 0,
-                        ttft=req_output.metrics.first_token_time - req_output.metrics.first_scheduled_time,
-                        tbt=0 if len(req_output.outputs[0].token_ids) <= 1 else (req_output.metrics.finished_time - req_output.metrics.first_token_time) / (len(req_output.outputs[0].token_ids)-1),
-                        e2e=req_output.metrics.finished_time - req_output.metrics.first_scheduled_time,
-                        arrival_time=req_output.metrics.arrival_time,
-                        last_token_time=req_output.metrics.last_token_time,
-                        first_scheduled_time=req_output.metrics.first_scheduled_time,
-                        first_token_time=req_output.metrics.first_token_time,
-                        time_in_queue=req_output.metrics.time_in_queue,
-                        finished_time=req_output.metrics.finished_time,
-                        scheduler_time=req_output.metrics.scheduler_time,
-                        model_forward_time=req_output.metrics.model_forward_time,
-                        model_execute_time=req_output.metrics.model_execute_time
+                    RequestOutput.from_vllm_output(
+                        request.id, req_output, modality_token_index
                     )
                 )
 
