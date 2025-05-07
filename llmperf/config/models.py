@@ -84,6 +84,22 @@ MODELS = {
         image_token_index=151655,
         video_token_index=151656
     ),
+    Model(
+        name="Qwen2-7B",
+        path="Qwen/Qwen2-VL-7B-Instruct",
+        max_model_len=128000,
+        alias="qwen-2",
+        image_token_index=151655,
+        video_token_index=151656
+    ),
+    Model(
+        name="Qwen2-2B",
+        path="Qwen/Qwen2-VL-2B-Instruct",
+        max_model_len=32768,
+        alias="qwen-2-small",
+        image_token_index=151655,
+        video_token_index=151656
+    ),
 }
 
 def get_model_by_name(name: str) -> Union[None, Model]:
