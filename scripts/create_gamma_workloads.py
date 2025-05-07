@@ -11,6 +11,7 @@ from llmperf.constants import WORKLOADS_DIR
 
 GAMMA_PARAMS = {
         ## ! Keep shape = 0.5 based on BurstGPT paper
+        # Coefficient of Variation (CV) = 1 / sqrt(shape), e.g CV = 8, A = 1/64
         # request rate: (shape, scale) (A, B)
         10.0: (0.5, 0.197),
         9.5: (0.5, 0.211),
