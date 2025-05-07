@@ -38,6 +38,12 @@ exec "$SHELL"
     ```
     VLLM_USE_PRECOMPILED=1 pip install --editable .
     ```
+    or (for v0.8.4)
+    ```
+    export VLLM_COMMIT=dc1b4a6f1300003ae27f033afbdff5e2683721ce
+    export VLLM_PRECOMPILED_WHEEL_LOCATION=https://wheels.vllm.ai/${VLLM_COMMIT}/vllm-1.0.0.dev-cp38-abi3-manylinux1_x86_64.whl
+    pip install --editable .
+    ```
 4. Install llmperf
     ```
     cd ..
@@ -47,7 +53,7 @@ exec "$SHELL"
 Remember to check the contributing guide for vLLM!
 ```
 cd vllm
-pip install -r requirements-dev.txt
+pip install -r requirements/dev.txt
 pre-commit install --hook-type pre-commit --hook-type commit-msg
 pre-commit run --all-files
 ```
