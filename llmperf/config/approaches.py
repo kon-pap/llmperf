@@ -26,17 +26,6 @@ APPROACHES = {
         name="Vanilla vLLM",
         alias="vllm"
     ),
-    Approach(
-        name="vLLM with Chunked-prefill",
-        alias="vllm-chunk",
-        enable_chunked_prefill=True
-    ),
-    Approach(
-        name="Memory Ballooning",
-        alias="mem-balloon",
-        enable_custom_scheduler=True,
-        enable_chunked_prefill=True
-    )
 }
 
 def get_approach_by_name(name: str) -> Union[None, Approach]:
