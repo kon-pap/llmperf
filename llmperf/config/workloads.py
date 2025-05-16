@@ -13,10 +13,6 @@ class Request:
     output: str
     id: str = None
     modality_path: Optional[Union[str,LiteralString]] = None
-    # image size: (width, height) pixels
-    # multi image size: [(w0, h0), (w1, h1), ...]
-    # video size: duration in sec
-    # audio size: duration in sec
     modality_size: Optional[Dict] = field(default_factory=dict)
 
     def __post_init__(self): 
