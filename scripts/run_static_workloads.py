@@ -22,9 +22,9 @@ def parse_args():
     parser.add_argument('--swap-space', type=int, default=0,
                         help='Swap space used in GB (default: 0)')
     parser.add_argument('--model', type=str, required=True,
-                        help='Model name (e.g., LLaVA-Onevision-7b)')
+                        help='Model alias (e.g., llava-ov)')
     parser.add_argument('--workload', type=str, required=True,
-                        help='Workload type (e.g., Video Description)')
+                        help='Workload alias (e.g., video-static)')
 
     return parser.parse_args()
 
