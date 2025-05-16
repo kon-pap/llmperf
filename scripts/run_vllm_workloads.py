@@ -1,146 +1,174 @@
+import argparse
+import asyncio
 import time
+import yaml
 
 from datetime import datetime
-from tqdm import tqdm
-from vllm import LLM, SamplingParams
+from tqdm.asyncio import tqdm
 
-from llmperf.config.approaches import get_approach_by_name
-from llmperf.config.models import get_model_by_name
-from llmperf.config.workloads import get_workload_by_name
+from vllm import AsyncEngineArgs, RequestOutput as vllmRequestOutput, SamplingParams
+from vllm.v1.engine.async_llm import AsyncLLM
+
+from llmperf.config.approaches import get_approach_by_alias
+from llmperf.config.models import get_model_by_alias
+from llmperf.config.workloads import get_workload_by_alias, Request
 from llmperf.postprocessing.output import RequestOutput, ExperimentOutput
+from llmperf.utils import get_modality_token_index, prepare_final_prompt
 
-if __name__ == '__main__':
+# Global variables
+llm = None
+model = None
+
+async def send_request(idx: int, request: Request, timestamp: float, max_tokens: int) -> vllmRequestOutput:
+    await asyncio.sleep(timestamp)
+
+    sampling_params = SamplingParams(
+        ignore_eos=True,
+        max_tokens=max_tokens
+    )
+
+    final_prompt = prepare_final_prompt(request, model)
+    
+    final_output = None
+    async for output in llm.generate(final_prompt, sampling_params, str(idx)):
+        final_output = output
+
+    assert final_output is not None
+
+    return final_output
+
+async def main(args: argparse.Namespace):
     START_TIME = datetime.now().strftime("%Y%m%d-%H%M%S")
 
-    GPU_UTIL = 0.95
-    SWAP_SPACE = 0
-    approach = get_approach_by_name("Vanilla vLLM")
+    approach = get_approach_by_alias(args.approach)
+    global model
+    model = get_model_by_alias(args.model)
+    workload = get_workload_by_alias(args.workload)
+    workload.load()
 
-    workload_names = [
-        "Text Conversations with Poisson 0.5",
-        "Mixed Modalities with Poisson 0.5 15%"
-    ]
+    profiling_data = {}
+    for eo_id in args.profiling_data:
+        eo = ExperimentOutput(id=eo_id)
+        eo.load()
 
-    model_names = ["Mistral-7b"] * len(workload_names)
+        for o in eo.request_outputs:
+            profiling_data[o.id] = o
 
-    # Read static results and get modality tokens and output tokens
-    text_iso = ExperimentOutput(id="text-static-text-mistral-iso-20250107-125738")
-    text_iso.load()
-    image_iso = ExperimentOutput(id="image-static-image-mistral-iso-20250107-125738")
-    image_iso.load()
-    video_iso = ExperimentOutput(id="video-static-video-mistral-iso-20250107-222022")
-    video_iso.load()
-    audio_iso = ExperimentOutput(id="audio-static-audio-qwen-iso-20250107-210445")
-    audio_iso.load()
+    try:
+        engine_args = AsyncEngineArgs(
+            model=model.path,
+            gpu_memory_utilization=args.gpu_util,
+            swap_space=args.swap_space,
+            scheduling_policy=approach.scheduling_policy,
+            disable_log_requests=True,
+            disable_log_stats = False,
+            max_model_len=args.max_model_len,
+            max_num_batched_tokens=args.max_num_batched_tokens,
+            num_gpu_blocks_override=args.num_gpu_blocks_override
+        )
 
-    text_id_pool = { o.id for o in text_iso.request_outputs }
-    image_id_pool = { o.id for o in image_iso.request_outputs }
-    video_id_pool = { o.id for o in video_iso.request_outputs }
-    audio_id_pool = { o.id for o in audio_iso.request_outputs }
+        global llm
+        llm = AsyncLLM.from_engine_args(engine_args)
 
-    iso_outputs = { o.id: o for o in text_iso.request_outputs + image_iso.request_outputs + video_iso.request_outputs + audio_iso.request_outputs }
+        requests = workload.requests
+        timestamps = workload.timestamps
+
+        # Match indexes to request
+        idx_to_req = {}
+        for idx, request in enumerate(requests):
+            idx_to_req[str(idx)] = request
+
+        # Create max tokens list
+        max_tokens = []
+        for request in requests:
+            mt = profiling_data[request.id].decode_tokens_cnt
+            max_tokens.append(mt)
+        
+        outputs = []
+        start_time = now = time.time()
+        pending_requests = [
+            send_request(idx, request, ts, mt) for idx, (request, ts, mt) in enumerate(zip(requests, timestamps, max_tokens))
+        ]
+
+        progress = tqdm(total=len(pending_requests), desc="Processing requests")
+        request_outputs = []
+        for completed_req_output in asyncio.as_completed(pending_requests):
+            req_output: vllmRequestOutput = await completed_req_output
+            request_outputs.append(req_output)
+            now = time.time()
+            progress.update(1)
+
+        progress.close()
+
+        for req_output in request_outputs:
+            original_request = idx_to_req[req_output.request_id]
+            modality_token_index = get_modality_token_index(original_request, model)
+
+            outputs.append(
+                RequestOutput.from_vllm_output(
+                    original_request.id, req_output, modality_token_index
+                )
+            )
     
-    for workload_name, model_name in zip(workload_names, model_names):
-        try:
-            model = get_model_by_name(model_name)
+    finally:
+        elapsed_time = now - start_time
 
-            llm = LLM(
-                model=model.path,
-                gpu_memory_utilization=GPU_UTIL,
-                swap_space=SWAP_SPACE,
-                scheduling_policy=approach.scheduling_policy,
-                enable_custom_scheduler=approach.enable_custom_scheduler,
-                enable_chunked_prefill=approach.enable_chunked_prefill
-            )
+        experiment_output = ExperimentOutput(
+            id=f"{workload.alias}-{model.alias}-{approach.alias}-{START_TIME}",
+            elapsed_time=elapsed_time,
+            request_outputs=outputs
+        )
+        experiment_output.save()
+        print(f"Saved {experiment_output.id}")
 
-            workload = get_workload_by_name(workload_name)
-            workload.load()
-            requests = workload.requests
-            timestamps = workload.timestamps
-            
-            pbar = tqdm(total=len(requests), desc='Finished requests')
+def parse_args() -> argparse.Namespace:
+    config_parser = argparse.ArgumentParser(add_help=False)
+    config_parser.add_argument("--config", type=str, help="Path to a YAML config file")
+    config_args, remaining = config_parser.parse_known_args()
+    
+    parser = argparse.ArgumentParser(
+        description="Parse resource usage and experiment metadata."
+    )
 
-            outputs = []
-            request_cnt_to_id = {}
-            start_time = time.time()
-            while ((requests and timestamps) or llm.llm_engine.has_unfinished_requests()):
-                now = time.time()
+    parser.add_argument("--gpu-util", type=float, default=0.95,
+                        help="GPU utilization percentage (default: 0.95)")
+    parser.add_argument("--swap-space", type=int, default=0,
+                        help="Swap space used in GB (default: 0)")
+    parser.add_argument("--model", type=str, required=True,
+                        help="Model alias (e.g., llava-ov)")
+    parser.add_argument("--workload", type=str, required=True,
+                        help="Workload alias (e.g., text-poisson-1.0)")
+    parser.add_argument("--approach", type=str, required=True,
+                        help="Approach alias (e.g., vllm)")
+    
+    parser.add_argument("--max-model-len", type=int, default=None,
+                        help="Model context length")
+    parser.add_argument("--max-num-batched-tokens", type=str, default=None,
+                        help="Maximum number of batched tokens per iteration")
+    parser.add_argument("--num-gpu-blocks-override", type=str, default=None,
+                        help="Number of GPU blocks")
+    
+    parser.add_argument("--profiling-data", nargs="+", type=str, required=True,
+                        help="List of experiment output ids")
+    
+    final_args = []
 
-                while requests:
-                    if timestamps[0] <= now - start_time:
-                        request = requests.pop(0)
-                        request_time = timestamps.pop(0)
+    if config_args.config:
+        with open(config_args.config, 'r') as f:
+            yaml_args = yaml.safe_load(f)
 
-                        request_id = str(next(llm.request_counter))
-                        request_cnt_to_id[request_id] = request.id
+        for k, v in yaml_args.items():
+            key = f"--{k.replace('_', '-')}"
+            if isinstance(v, list):
+                final_args.append(key)
+                final_args.extend(map(str, v))
+            elif v is not None:
+                final_args.extend([key, str(v)])
 
-                        sampling_params = SamplingParams(
-                            ignore_eos=True,
-                            max_tokens=iso_outputs[request.id].decode_tokens_cnt
-                        )
+    final_args += remaining
 
-                        # Create a replacement prompt of equal length
-                        replacement_prompt = " ".join("A" * (iso_outputs[request.id].prompt_tokens_cnt-1))
+    return parser.parse_args(final_args)
 
-                        # Add the overhead based on the modality
-                        overhead = 0.0
-                        if request.id not in text_id_pool:
-                            overhead = iso_outputs[request.id].processor_time + iso_outputs[request.id].encoder_time
-
-                        llm.llm_engine.add_request(
-                            request_id=request_id,
-                            prompt=replacement_prompt,
-                            params=sampling_params,
-                            arrival_time=start_time + request_time,
-                            overhead=overhead
-                        )
-                    else:
-                        break
-                
-                step_outputs = llm.llm_engine.step()
-
-                now = time.time()
-                for req_output in step_outputs:
-                    if req_output.finished:
-                        original_request_id = request_cnt_to_id[req_output.request_id]
-                        # Set the modality_tokens_cnt based on the request.id (and the modality of the request)
-                        if original_request_id in text_id_pool:
-                            modality_tokens_cnt = 0
-                        else:
-                            modality_tokens_cnt = iso_outputs[original_request_id].modality_tokens_cnt
-                        
-                        outputs.append(
-                            RequestOutput(
-                                id=original_request_id,
-                                prompt_tokens_cnt=len(req_output.prompt_token_ids),
-                                modality_tokens_cnt=modality_tokens_cnt,
-                                decode_tokens_cnt=len(req_output.outputs[0].token_ids),
-                                processor_time=req_output.metrics.processor_time,
-                                encoder_time=req_output.metrics.encoder_time if req_output.metrics.encoder_time else 0,
-                                ttft=req_output.metrics.first_token_time - req_output.metrics.first_scheduled_time,
-                                tbt=0 if len(req_output.outputs[0].token_ids) <= 1 else (req_output.metrics.finished_time - req_output.metrics.first_token_time) / (len(req_output.outputs[0].token_ids)-1),
-                                e2e=req_output.metrics.finished_time - req_output.metrics.first_scheduled_time,
-                                arrival_time=req_output.metrics.arrival_time,
-                                last_token_time=req_output.metrics.last_token_time,
-                                first_scheduled_time=req_output.metrics.first_scheduled_time,
-                                first_token_time=req_output.metrics.first_token_time,
-                                time_in_queue=req_output.metrics.time_in_queue,
-                                finished_time=req_output.metrics.finished_time,
-                                scheduler_time=req_output.metrics.scheduler_time,
-                                model_forward_time=req_output.metrics.model_forward_time,
-                                model_execute_time=req_output.metrics.model_execute_time
-                            )
-                        )
-                        pbar.update(1)
-        finally:
-            pbar.close()
-            elapsed_time = now - start_time
-
-            experiment_output = ExperimentOutput(
-                id=f"{workload.alias}-{model.alias}-{approach.alias}-{START_TIME}",
-                elapsed_time=elapsed_time,
-                request_outputs=outputs
-            )
-            experiment_output.save()
-
-            llm = None
+if __name__ == "__main__":
+    args = parse_args()
+    asyncio.run(main(args))   
