@@ -68,7 +68,7 @@ async def main(args: argparse.Namespace):
         )
 
         global llm
-        llm = AsyncLLM.from_engine_args(engine_args)
+        llm = AsyncLLM.from_engine_args(engine_args, log_file=args.log_file)
 
         requests = workload.requests
         timestamps = workload.timestamps
@@ -119,7 +119,10 @@ async def main(args: argparse.Namespace):
             request_outputs=outputs
         )
         experiment_output.save()
-        print(f"Saved {experiment_output.id}")
+        print(f"Saved {experiment_output.id} outputs")
+
+        experiment_output.save_engine_stats(log_file=args.log_file)
+        print(f"Saved {experiment_output.id} engine stats")
 
 def parse_args() -> argparse.Namespace:
     config_parser = argparse.ArgumentParser(add_help=False)
@@ -140,6 +143,9 @@ def parse_args() -> argparse.Namespace:
                         help="Workload alias (e.g., text-poisson-1.0)")
     parser.add_argument("--approach", type=str, required=True,
                         help="Approach alias (e.g., vllm)")
+    
+    parser.add_argument("--log-file", type=str, default="engine-stats.log",
+                        help="Log file path (default: engine-stats.log)")
     
     parser.add_argument("--max-model-len", type=int, default=None,
                         help="Model context length")

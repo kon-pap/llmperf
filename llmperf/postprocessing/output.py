@@ -1,11 +1,14 @@
 import json
 import os
+import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
 
 from dataclasses import asdict, dataclass, field
 from typing import List, LiteralString, Optional, Union
 from vllm import RequestOutput as vllmRequestOutput
 
-from llmperf.constants import EXPERIMENTS_LOG, EXPERIMENTS_OUTPUTS_DIR
+from llmperf.constants import EXPERIMENTS_LOG, EXPERIMENTS_OUTPUTS_DIR, EXPERIMENTS_ENGINE_STATS_DIR
 
 @dataclass
 class RequestOutput:
@@ -26,6 +29,12 @@ class RequestOutput:
     model_forward_time: Optional[float] = None
     model_execute_time: Optional[float] = None
     model_encoder_time: Optional[float] = None
+
+    # Metadata
+    estimated_time: Optional[float] = None
+    category: Optional[str] = None
+    stl: Optional[bool] = None
+    aborted: Optional[bool] = None
 
     @property
     def processor_time(self) -> float:
@@ -65,6 +74,17 @@ class RequestOutput:
     
     @classmethod
     def from_vllm_output(cls, req_id: str, req_output: vllmRequestOutput, modality_token_index: int = -1) -> "RequestOutput":
+        aborted = (
+            len(req_output.outputs[0].token_ids) == 1 and \
+            req_output.outputs[0].token_ids[0] == -1
+        )
+
+        estimated_time = category = stl = None
+        if md := req_output.request_md:
+            estimated_time = md.estimated_time
+            category = md.category
+            stl = md.stl
+
         return cls(
             id=req_id,
             prompt_tokens_cnt=len(req_output.prompt_token_ids),
@@ -81,7 +101,17 @@ class RequestOutput:
             model_forward_time=req_output.metrics.model_forward_time,
             model_execute_time=req_output.metrics.model_execute_time,
             model_encoder_time=req_output.metrics.model_encoder_time,
+            estimated_time=estimated_time,
+            category=category,
+            stl=stl,
+            aborted=aborted
         )
+
+@dataclass
+class EngineStats:
+    timestamps: List[float]
+    kv_cache_usage: List[float]
+    num_preemptions: List[int]
 
 @dataclass
 class ExperimentOutput:
@@ -90,6 +120,8 @@ class ExperimentOutput:
     request_outputs: List[RequestOutput] = field(default_factory=list)
     output_path: Optional[Union[str,LiteralString]] = None
     output_log_path: Optional[Union[str,LiteralString]] = None
+    engine_stats_path: Optional[Union[str,LiteralString]] = None
+    engine_stats: Optional[EngineStats] = None
 
     @property
     def num_requests(self) -> int:
@@ -113,6 +145,23 @@ class ExperimentOutput:
     def tokens_per_second(self) -> float:
         return self.total_num_tokens / self.elapsed_time
 
+
+    def save_engine_stats(self, log_file: Union[str,LiteralString]):
+        path = os.path.join(self.engine_stats_path or EXPERIMENTS_ENGINE_STATS_DIR, f"{self.id}.parquet")
+
+        df = pd.read_csv(log_file)
+        table = pa.Table.from_pandas(df)
+        pq.write_table(table, path, compression="brotli", compression_level=11)
+
+    def load_engine_stats(self):
+        path = os.path.join(self.engine_stats_path or EXPERIMENTS_ENGINE_STATS_DIR, f"{self.id}.parquet")
+        df = pd.read_parquet(path)
+        
+        self.engine_stats = EngineStats(
+            timestamps=df["ts"].tolist(),
+            kv_cache_usage=df["usg"].tolist(),
+            num_preemptions=df["num_preemptions"].tolist()
+        )
 
     def save(self):
         path = os.path.join(self.output_path or EXPERIMENTS_OUTPUTS_DIR, f"{self.id}.jsonl")
