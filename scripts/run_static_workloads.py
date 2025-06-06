@@ -25,6 +25,13 @@ def parse_args():
                         help='Model alias (e.g., llava-ov)')
     parser.add_argument('--workload', type=str, required=True,
                         help='Workload alias (e.g., video-static)')
+    
+    parser.add_argument("--max-model-len", type=int, default=None,
+                        help="Model context length")
+    parser.add_argument("--max-num-batched-tokens", type=int, default=None,
+                        help="Maximum number of batched tokens per iteration")
+    parser.add_argument("--num-gpu-blocks-override", type=int, default=None,
+                        help="Number of GPU blocks")
 
     return parser.parse_args()
 
@@ -45,9 +52,11 @@ if __name__ == '__main__':
             swap_space=args.swap_space,
             scheduling_policy=approach.scheduling_policy,
             disable_log_stats=False,
-            max_model_len=model.max_model_len,
-            max_num_batched_tokens=model.max_model_len,
-            num_gpu_blocks_override=model.max_model_len // 16
+            max_model_len=args.max_model_len or model.max_model_len,
+            max_num_batched_tokens=args.max_num_batched_tokens or model.max_model_len,
+            num_gpu_blocks_override=args.num_gpu_blocks_override or (model.max_model_len // 16),
+            hf_token=True, # requires huggingface-cli login
+            hf_overrides={"architectures": ["DeepseekVLV2ForCausalLM"]} if model.alias.startswith("deepseek-vl2") else None
         )
 
         requests = workload.requests
