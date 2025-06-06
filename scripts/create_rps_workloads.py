@@ -4,7 +4,6 @@ import random
 
 from transformers import AutoTokenizer
 
-from llmperf.config.models import get_model_by_name
 from llmperf.config.workloads import Request, Workload
 from llmperf.config.workloads import get_workload_by_name
 from llmperf.constants import WORKLOADS_DIR
@@ -32,8 +31,8 @@ if __name__ == '__main__':
     It creates mixed modalities workloads by randomly replacing text requests.
     RPS_PCTS = [% of sand, % of pebbles, % of rocks]
     """
-    RPS_PCTS = [0.45, 0.35, 0.2] # [0.6, 0.3, 0.1]
-    REQUEST_RATES = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
+    RPS_PCTS = [0.45, 0.35, 0.2] # [0.6, 0.3, 0.1] [0.7, 0.3, 0.0]
+    REQUEST_RATES = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
 
     REFERENCE_MODEL_NAME = "Mistral-7b"
 
@@ -96,8 +95,11 @@ if __name__ == '__main__':
 
         _, pebbles_idxs, rocks_idxs = categorize_numbers(len(requests), (sand_pct, pebbles_pct, rocks_pct))
 
-        model = get_model_by_name(REFERENCE_MODEL_NAME)
-        tokenizer = AutoTokenizer.from_pretrained(model.path)
+        if pebbles_pct == 0.0:
+            pebbles_idxs = []
+        
+        if rocks_pct == 0.0:
+            rocks_idxs = []
 
         # Replace pebbles
         pebbles_workload = get_workload_by_name(pebbles_workload_name)

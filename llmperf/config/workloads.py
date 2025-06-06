@@ -204,6 +204,20 @@ _WORKLOADS_MIX_GAMMA_45 = {
     for rate in [0.1, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
 }
 
+# Rocks Pebbles Sand with Poisson | Varying request rate | 70% - 30% - 0%
+_WORKLOADS_RPS_POISSON_70_30_0 = {
+    Workload(
+        name=f"Rock - Pebbles - Sand with Poisson {rate} 70%-30%-0%",
+        path=os.path.join(WORKLOADS_DIR, "rps-poisson-70-30-0"),
+        alias=f"rps-poisson-{rate}-70-30-0",
+        arrival_dist="poisson",
+        modalities=["text", "image"],
+        modality_pct=[0.7, 0.3],
+        modality_dist="categorical"
+    )
+    for rate in [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
+}
+
 # Rocks Pebbles Sand with Poisson | Varying request rate | 60% - 30% - 10%
 _WORKLOADS_RPS_POISSON_60_30_10 = {
     Workload(
@@ -215,7 +229,7 @@ _WORKLOADS_RPS_POISSON_60_30_10 = {
         modality_pct=[0.6, 0.3, 0.1],
         modality_dist="categorical"
     )
-    for rate in [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
+    for rate in [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
 }
 
 # Rocks Pebbles Sand with Poisson | Varying request rate | 45% - 35% - 20%
@@ -241,6 +255,7 @@ WORKLOADS = _WORKLOADS_STATIC | \
     _WORKLOADS_MIX_GAMMA_15 | \
     _WORKLOADS_MIX_GAMMA_30 | \
     _WORKLOADS_MIX_GAMMA_45 | \
+    _WORKLOADS_RPS_POISSON_70_30_0 | \
     _WORKLOADS_RPS_POISSON_60_30_10 | \
     _WORKLOADS_RPS_POISSON_45_35_20
 
