@@ -145,9 +145,9 @@ def parse_args() -> argparse.Namespace:
     
     parser.add_argument("--max-model-len", type=int, default=None,
                         help="Model context length")
-    parser.add_argument("--max-num-batched-tokens", type=str, default=None,
+    parser.add_argument("--max-num-batched-tokens", type=int, default=None,
                         help="Maximum number of batched tokens per iteration")
-    parser.add_argument("--num-gpu-blocks-override", type=str, default=None,
+    parser.add_argument("--num-gpu-blocks-override", type=int, default=None,
                         help="Number of GPU blocks")
     
     parser.add_argument("--profiling-data", nargs="+", type=str, required=True,
