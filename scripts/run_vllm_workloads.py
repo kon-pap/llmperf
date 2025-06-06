@@ -4,7 +4,7 @@ import time
 import yaml
 
 from datetime import datetime
-from tqdm.asyncio import tqdm
+from tqdm.asyncio import tqdm_asyncio
 
 from vllm import AsyncEngineArgs, RequestOutput as vllmRequestOutput, SamplingParams
 from vllm.v1.engine.async_llm import AsyncLLM
@@ -90,15 +90,11 @@ async def main(args: argparse.Namespace):
             send_request(idx, request, ts, mt) for idx, (request, ts, mt) in enumerate(zip(requests, timestamps, max_tokens))
         ]
 
-        progress = tqdm(total=len(pending_requests), desc="Processing requests")
         request_outputs = []
-        for completed_req_output in asyncio.as_completed(pending_requests):
+        for completed_req_output in tqdm_asyncio.as_completed(pending_requests):
             req_output: vllmRequestOutput = await completed_req_output
             request_outputs.append(req_output)
             now = time.time()
-            progress.update(1)
-
-        progress.close()
 
         for req_output in request_outputs:
             original_request = idx_to_req[req_output.request_id]
