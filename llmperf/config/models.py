@@ -37,6 +37,21 @@ MODELS = {
         alias="image-mistral",
         image_token_index=32000
     ),
+    # Duplicate LLaVA 1.6
+    Model(
+        name="LLaVA-1.6-7B",
+        path="llava-hf/llava-v1.6-mistral-7b-hf",
+        max_model_len=32768,
+        alias="llava-1.6-small",
+        image_token_index=32000
+    ),
+    Model(
+        name="LLaVA-1.6-13B",
+        path="llava-hf/llava-v1.6-vicuna-13b-hf",
+        max_model_len=4096,
+        alias="llava-1.6",
+        image_token_index=32000
+    ),
     Model(
         name="LLaVA-Next-Video (Mistral-7b)",
         path="llava-hf/LLaVA-NeXT-Video-7B-32K-hf",
@@ -99,6 +114,62 @@ MODELS = {
         alias="qwen-2-small",
         image_token_index=151655,
         video_token_index=151656
+    ),
+    Model(
+        name="Gemma3-4B",
+        path="google/gemma-3-4b-it",
+        max_model_len=131072,
+        alias="gemma-3-small",
+        image_token_index=262144
+    ),
+    Model(
+        name="Gemma3-12B",
+        path="google/gemma-3-12b-it",
+        max_model_len=131072,
+        alias="gemma-3",
+        image_token_index=262144
+    ),
+    Model(
+        name="DeepSeek-VL2-1B",
+        path="deepseek-ai/deepseek-vl2-tiny",
+        max_model_len=4096,
+        alias="deepseek-vl2-tiny",
+        image_token_index=128815
+    ),
+    Model(
+        name="DeepSeek-VL2-2.8B",
+        path="deepseek-ai/deepseek-vl2-small",
+        max_model_len=4096,
+        alias="deepseek-vl2-small",
+        image_token_index=100003
+    ),
+    Model(
+        name="DeepSeek-VL2-4.5B",
+        path="deepseek-ai/deepseek-vl2",
+        max_model_len=4096,
+        alias="deepseek-vl2",
+        image_token_index=128815
+    ),
+    Model(
+        name="LLaVA-1.5-7B",
+        path="llava-hf/llava-1.5-7b-hf",
+        max_model_len=4096,
+        alias="llava-1.5-small",
+        image_token_index=32000
+    ),
+    Model(
+        name="LLaVA-1.5-13B",
+        path="llava-hf/llava-1.5-13b-hf",
+        max_model_len=4096,
+        alias="llava-1.5",
+        image_token_index=32000
+    ),
+    Model(
+        name="Pixtral-12B",
+        path="mistral-community/pixtral-12b",
+        max_model_len=131072,
+        alias="pixtral",
+        image_token_index=10
     ),
 }
 
