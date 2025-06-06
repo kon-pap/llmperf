@@ -19,6 +19,14 @@ def duration_to_frames(duration, min_duration=1, max_duration=180, min_frames=8,
 
 def prepare_text_prompt(request: Request, model: Model) -> Dict:
     tokenizer = AutoTokenizer.from_pretrained(model.path)
+    if tokenizer.chat_template is None:
+        tokenizer = AutoProcessor.from_pretrained(model.path, use_fast=True)
+    
+    if tokenizer.chat_template is None:
+        return {
+            "prompt": f"<|User|>: {request.input}\n\n<|Assistant|>:"
+        }
+
     prompt = [
         {"role": "user", "content": request.input}
     ]
@@ -34,7 +42,15 @@ def prepare_text_prompt(request: Request, model: Model) -> Dict:
     return final_prompt
 
 def prepare_image_prompt(request: Request, model: Model) -> Dict:
-    processor = AutoProcessor.from_pretrained(model.path)
+    processor = AutoProcessor.from_pretrained(model.path, use_fast=True)
+
+    if processor.chat_template is None:
+        image = load_image(request.modality_path)
+        return {
+            "prompt": f"<|User|>: <image>\n{request.input}\n\n<|Assistant|>:",
+            "multi_modal_data": {"image": image}
+        }
+    
     prompt = [
         {
             "role": "user",
@@ -59,7 +75,7 @@ def prepare_image_prompt(request: Request, model: Model) -> Dict:
     return final_prompt
 
 def prepare_video_prompt(request: Request, model: Model) -> Dict:
-    processor = AutoProcessor.from_pretrained(model.path)
+    processor = AutoProcessor.from_pretrained(model.path, use_fast=True)
     prompt = [
         {
             "role": "user",
@@ -91,7 +107,7 @@ def prepare_video_prompt(request: Request, model: Model) -> Dict:
     return final_prompt
 
 def prepare_audio_prompt(request: Request, model: Model) -> Dict:
-    processor = AutoProcessor.from_pretrained(model.path)
+    processor = AutoProcessor.from_pretrained(model.path, use_fast=True)
     audio_in_prompt = "".join([
         f"Audio 1: "
         f"<|audio_bos|><|AUDIO|><|audio_eos|>\n"
