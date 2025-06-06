@@ -68,6 +68,9 @@ def prepare_image_prompt(request: Request, model: Model) -> Dict:
     
     image = load_image(request.modality_path)
 
+    if image.mode != "RGB" and model.alias.startswith("gemma-3"):
+        image = image.convert("RGB")
+
     final_prompt = {
         "prompt": formatted_prompt,
         "multi_modal_data": {"image": image}
