@@ -22,23 +22,23 @@ exec "$SHELL"
 ```
 1. Clone repositories
     ```
-    git clone git@gitlab.software.imdea.org:muse-lab/mllm-inference-workload-eval.git
-    cd mllm-inference-workload-eval/
-    git clone git@gitlab.software.imdea.org:muse-lab/vllm.git
+    git clone https://github.com/kon-pap/llmperf.git
+    cd llmperf/
+    git clone https://github.com/kon-pap/vllm.git
     cd vllm/
-    git checkout dev
+    git checkout v0.0.1.baseline
     ```
 2. Create virtual environemnt
     ```
     pyenv install 3.12.8
-    pyenv virtualenv 3.12.8 vllm-v0.7.2
-    pyenv activate vllm-v0.7.2
+    pyenv virtualenv 3.12.8 vllm-v0.8.4
+    pyenv activate vllm-v0.8.4
     ```
 3. Install vllm (for image, video, audio)
     ```
     VLLM_USE_PRECOMPILED=1 pip install --editable .
     ```
-    or (for v0.8.4)
+    or (use this for v0.8.4)
     ```
     export VLLM_COMMIT=dc1b4a6f1300003ae27f033afbdff5e2683721ce
     export VLLM_PRECOMPILED_WHEEL_LOCATION=https://wheels.vllm.ai/${VLLM_COMMIT}/vllm-1.0.0.dev-cp38-abi3-manylinux1_x86_64.whl
@@ -75,6 +75,4 @@ python scripts/create_gamma_workloads.py # Create {text,mix}-gamma workloads usi
 ```
 python scripts/run_static_workloads.py # Run static workloads in isolation
 python scripts/run_vllm_workloads.py # Run workloads in vllm
-python scripts/run_vllm_chunk_workloads.py # Run workloads in vllm with chunked prefill
-python scripts/run_mem_balloon_workloads.py # Run workloads in vllm with memory ballooning
 ```
