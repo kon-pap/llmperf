@@ -5,8 +5,10 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from dataclasses import asdict, dataclass, field
-from typing import List, LiteralString, Optional, Union
-from vllm import RequestOutput as vllmRequestOutput
+from typing import List, LiteralString, Optional, Union, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from vllm import RequestOutput as vllmRequestOutput
 
 from llmperf.constants import EXPERIMENTS_LOG, EXPERIMENTS_OUTPUTS_DIR, EXPERIMENTS_ENGINE_STATS_DIR
 
@@ -73,7 +75,7 @@ class RequestOutput:
         return self.last_token_time - self.first_scheduled_time
     
     @classmethod
-    def from_vllm_output(cls, req_id: str, req_output: vllmRequestOutput, modality_token_index: int = -1) -> "RequestOutput":
+    def from_vllm_output(cls, req_id: str, req_output: "vllmRequestOutput", modality_token_index: int = -1) -> "RequestOutput":
         aborted = (
             len(req_output.outputs[0].token_ids) == 1 and \
             req_output.outputs[0].token_ids[0] == -1

@@ -2,7 +2,7 @@ import json
 import os
 
 from dataclasses import dataclass, field
-from typing import Callable, Dict, List, LiteralString, Optional, Tuple, Union
+from typing import Callable, Dict, List, LiteralString, Optional, Union
 
 from llmperf.constants import DATASETS_DIR
 from llmperf.preprocessing.input import get_clotho_input, get_llava_image_reasoning_input, get_llava_video_description_input, get_sharegpt_input
