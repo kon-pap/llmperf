@@ -29,8 +29,8 @@ def parse_args():
 
 if __name__ == '__main__':
     """
-    This script creates mixed modalities workloads for every request rate in REQUEST_RATES
-    It creates mixed modalities workloads by creating one request stream per modality.
+    This script creates multi modalities workloads for every request rate in REQUEST_RATES
+    It creates multi modalities workloads by creating one request stream per modality.
     """
     args = parse_args()
 
@@ -72,7 +72,7 @@ if __name__ == '__main__':
             alias = f"{workload_alias}-poisson-{req_rate}-v2"
             final_workload = Workload(
                 name=name,
-                path=os.path.join(WORKLOADS_DIR, f"mixed-stream"),
+                path=os.path.join(WORKLOADS_DIR, f"multi-stream"),
                 alias=alias,
                 modalities=workload.modalities,
                 modality_pct=1.0,
@@ -116,7 +116,7 @@ if __name__ == '__main__':
                 alias = f"{base_workload_alias[0]}{first_workload_alias[0]}-poisson-{b}-{f}-v2"
                 final_workload = Workload(
                     name=name,
-                    path=os.path.join(WORKLOADS_DIR, f"mixed-stream"),
+                    path=os.path.join(WORKLOADS_DIR, f"multi-stream"),
                     alias=alias,
                     modalities=modalities,
                     modality_pct=modality_pct,
@@ -164,7 +164,7 @@ if __name__ == '__main__':
                     alias = f"{base_workload_alias[0]}{first_workload_alias[0]}{second_workload_alias[0]}-poisson-{b}-{f}-{s}-v2"
                     final_workload = Workload(
                         name=name,
-                        path=os.path.join(WORKLOADS_DIR, f"mixed-stream"),
+                        path=os.path.join(WORKLOADS_DIR, f"multi-stream"),
                         alias=alias,
                         modalities=modalities,
                         modality_pct=modality_pct,
