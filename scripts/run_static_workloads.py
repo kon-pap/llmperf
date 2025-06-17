@@ -33,6 +33,9 @@ def parse_args():
     parser.add_argument("--num-gpu-blocks-override", type=int, default=None,
                         help="Number of GPU blocks")
 
+    parser.add_argument("--multi-image", action="store_true",
+                        help="Use multiple images instead of video")
+
     return parser.parse_args()
 
 if __name__ == '__main__':
@@ -56,7 +59,8 @@ if __name__ == '__main__':
             max_num_batched_tokens=args.max_num_batched_tokens or model.max_model_len,
             num_gpu_blocks_override=args.num_gpu_blocks_override or (model.max_model_len // 16),
             hf_token=True, # requires huggingface-cli login
-            hf_overrides={"architectures": ["DeepseekVLV2ForCausalLM"]} if model.alias.startswith("deepseek-vl2") else None
+            hf_overrides={"architectures": ["DeepseekVLV2ForCausalLM"]} if model.alias.startswith("deepseek-vl2") else None,
+            limit_mm_per_prompt={"image": 64} if args.multi_image else None
         )
 
         requests = workload.requests
@@ -72,8 +76,8 @@ if __name__ == '__main__':
                 max_tokens=int(output_length)
             )
 
-            modality_token_index = get_modality_token_index(request, model)
-            final_prompt = prepare_final_prompt(request, model)
+            modality_token_index = get_modality_token_index(request, model, multi_image=args.multi_image)
+            final_prompt = prepare_final_prompt(request, model, multi_image=args.multi_image)
 
             req_output = llm.generate(
                 prompts=[final_prompt],

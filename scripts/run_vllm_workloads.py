@@ -19,7 +19,7 @@ from llmperf.utils import get_modality_token_index, prepare_final_prompt
 llm = None
 model = None
 
-async def send_request(idx: int, request: Request, timestamp: float, max_tokens: int) -> vllmRequestOutput:
+async def send_request(idx: int, request: Request, timestamp: float, max_tokens: int, multi_image: bool = False) -> vllmRequestOutput:
     await asyncio.sleep(timestamp)
 
     sampling_params = SamplingParams(
@@ -27,7 +27,7 @@ async def send_request(idx: int, request: Request, timestamp: float, max_tokens:
         max_tokens=max_tokens
     )
 
-    final_prompt = prepare_final_prompt(request, model)
+    final_prompt = prepare_final_prompt(request, model, multi_image=multi_image)
     
     final_output = None
     async for output in llm.generate(final_prompt, sampling_params, str(idx)):
@@ -87,7 +87,7 @@ async def main(args: argparse.Namespace):
         outputs = []
         start_time = now = time.time()
         pending_requests = [
-            send_request(idx, request, ts, mt) for idx, (request, ts, mt) in enumerate(zip(requests, timestamps, max_tokens))
+            send_request(idx, request, ts, mt, args.multi_image) for idx, (request, ts, mt) in enumerate(zip(requests, timestamps, max_tokens))
         ]
 
         request_outputs = []
@@ -98,7 +98,7 @@ async def main(args: argparse.Namespace):
 
         for req_output in request_outputs:
             original_request = idx_to_req[req_output.request_id]
-            modality_token_index = get_modality_token_index(original_request, model)
+            modality_token_index = get_modality_token_index(original_request, model, multi_image=args.multi_image)
 
             outputs.append(
                 RequestOutput.from_vllm_output(
@@ -152,6 +152,9 @@ def parse_args() -> argparse.Namespace:
     
     parser.add_argument("--profiling-data", nargs="+", type=str, required=True,
                         help="List of experiment output ids")
+    
+    parser.add_argument("--multi-image", action="store_true",
+                    help="Use multiple images instead of video")
     
     final_args = []
 
