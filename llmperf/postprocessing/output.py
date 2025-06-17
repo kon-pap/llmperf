@@ -113,7 +113,12 @@ class RequestOutput:
 class EngineStats:
     timestamps: List[float]
     kv_cache_usage: List[float]
-    num_preemptions: List[int]
+    preemptions_req_ids: List[List[str]]
+
+    num_preemptions: List[int] = field(init=False)
+
+    def __post_init__(self):
+        self.num_preemptions = [len(reqs) for reqs in self.preemptions_req_ids]
 
 @dataclass
 class ExperimentOutput:
@@ -151,7 +156,7 @@ class ExperimentOutput:
     def save_engine_stats(self, log_file: Union[str,LiteralString]):
         path = os.path.join(self.engine_stats_path or EXPERIMENTS_ENGINE_STATS_DIR, f"{self.id}.parquet")
 
-        df = pd.read_csv(log_file)
+        df = pd.read_json(log_file, lines=True)
         table = pa.Table.from_pandas(df)
         pq.write_table(table, path, compression="brotli", compression_level=11)
 
@@ -160,9 +165,9 @@ class ExperimentOutput:
         df = pd.read_parquet(path)
         
         self.engine_stats = EngineStats(
-            timestamps=df["ts"].tolist(),
-            kv_cache_usage=df["usg"].tolist(),
-            num_preemptions=df["num_preemptions"].tolist()
+            timestamps=df["timestamp"].tolist(),
+            kv_cache_usage=df["kv_cache_usage"].tolist(),
+            preemptions_req_ids=[list(arr) for arr in df["preempted_req_ids"].tolist()]
         )
 
     def save(self):
