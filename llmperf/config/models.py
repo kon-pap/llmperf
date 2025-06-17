@@ -68,7 +68,7 @@ MODELS = {
         audio_token_index=151646
     ),
     Model(
-        name="LLaVA-Onevision-7b",
+        name="LLaVA-OneVision-7b",
         path="llava-hf/llava-onevision-qwen2-7b-ov-chat-hf",
         max_model_len=32768,
         alias="llava-ov",
@@ -76,7 +76,7 @@ MODELS = {
         video_token_index=151647
     ),
     Model(
-        name="LLaVA-Onevision-500M",
+        name="LLaVA-OneVision-500M",
         path="llava-hf/llava-onevision-qwen2-0.5b-ov-hf",
         max_model_len=32768,
         alias="llava-ov-small",
