@@ -1,7 +1,6 @@
 import argparse
 import time
 
-from datetime import datetime
 from transformers import AutoTokenizer
 from tqdm import tqdm
 from vllm import LLM, SamplingParams
@@ -10,7 +9,7 @@ from llmperf.config.approaches import get_approach_by_alias
 from llmperf.config.models import get_model_by_alias
 from llmperf.config.workloads import get_workload_by_alias
 from llmperf.postprocessing.output import RequestOutput, ExperimentOutput
-from llmperf.utils import get_modality_token_index, prepare_final_prompt
+from llmperf.utils import create_experiment_id, get_modality_token_index, prepare_final_prompt
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -40,8 +39,6 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
-
-    START_TIME = datetime.now().strftime("%Y%m%d-%H%M%S")
 
     approach = get_approach_by_alias("iso")
     model = get_model_by_alias(args.model)
@@ -94,11 +91,24 @@ if __name__ == '__main__':
 
     finally:
         elapsed_time = now - start_time
-
-        experiment_output = ExperimentOutput(
-            id=f"{workload.alias}-{model.alias}-{approach.alias}-{START_TIME}",
-            elapsed_time=elapsed_time,
-            request_outputs=outputs
+        experiment_id = create_experiment_id(
+            workload.alias,
+            model.alias,
+            approach.alias,
+            args.gpu_util,
+            args.swap_space,
+            args.num_gpu_blocks_override,
+            args.max_model_len,
+            args.max_num_batched_tokens
         )
-        experiment_output.save()
-        print(f"Saved {experiment_output.id}")
+
+        if elapsed_time == 0:
+            print(f"Failed {experiment_id}")
+        else:
+            experiment_output = ExperimentOutput(
+                id=experiment_id,
+                elapsed_time=elapsed_time,
+                request_outputs=outputs
+            )
+            experiment_output.save()
+            print(f"Saved {experiment_output.id}")

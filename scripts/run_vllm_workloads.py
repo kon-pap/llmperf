@@ -3,7 +3,6 @@ import asyncio
 import time
 import yaml
 
-from datetime import datetime
 from tqdm.asyncio import tqdm_asyncio
 
 from vllm import AsyncEngineArgs, RequestOutput as vllmRequestOutput, SamplingParams
@@ -13,7 +12,7 @@ from llmperf.config.approaches import get_approach_by_alias
 from llmperf.config.models import get_model_by_alias
 from llmperf.config.workloads import get_workload_by_alias, Request
 from llmperf.postprocessing.output import RequestOutput, ExperimentOutput
-from llmperf.utils import get_modality_token_index, prepare_final_prompt
+from llmperf.utils import create_experiment_id, get_modality_token_index, prepare_final_prompt
 
 # Global variables
 llm = None
@@ -38,8 +37,6 @@ async def send_request(idx: int, request: Request, timestamp: float, max_tokens:
     return final_output
 
 async def main(args: argparse.Namespace):
-    START_TIME = datetime.now().strftime("%Y%m%d-%H%M%S")
-
     approach = get_approach_by_alias(args.approach)
     global model
     model = get_model_by_alias(args.model)
@@ -108,17 +105,30 @@ async def main(args: argparse.Namespace):
     
     finally:
         elapsed_time = now - start_time
-
-        experiment_output = ExperimentOutput(
-            id=f"{workload.alias}-{model.alias}-{approach.alias}-{START_TIME}",
-            elapsed_time=elapsed_time,
-            request_outputs=outputs
+        experiment_id = create_experiment_id(
+            workload.alias,
+            model.alias,
+            approach.alias,
+            args.gpu_util,
+            args.swap_space,
+            args.num_gpu_blocks_override,
+            args.max_model_len,
+            args.max_num_batched_tokens
         )
-        experiment_output.save()
-        print(f"Saved {experiment_output.id} outputs")
 
-        experiment_output.save_engine_stats(log_file=args.log_file)
-        print(f"Saved {experiment_output.id} engine stats")
+        if elapsed_time == 0:
+            print(f"Failed {experiment_id}")
+        else:
+            experiment_output = ExperimentOutput(
+                id=experiment_id,
+                elapsed_time=elapsed_time,
+                request_outputs=outputs
+            )
+            experiment_output.save()
+            print(f"Saved {experiment_output.id} outputs")
+
+            experiment_output.save_engine_stats(log_file=args.log_file)
+            print(f"Saved {experiment_output.id} engine stats")
 
 def parse_args() -> argparse.Namespace:
     config_parser = argparse.ArgumentParser(add_help=False)
