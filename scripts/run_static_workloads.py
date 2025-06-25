@@ -46,6 +46,14 @@ if __name__ == '__main__':
     workload.load()
 
     try:
+
+        limit_mm_per_prompt = None
+        if args.multi_image and workload.alias == "video-static":
+            limit_mm_per_prompt = {"image": 64}
+
+        if args.multi_image == False and workload.alias == "video-static":
+            limit_mm_per_prompt = {"video": 1}
+
         llm = LLM(
             model=model.path,
             gpu_memory_utilization=args.gpu_util,
@@ -57,7 +65,9 @@ if __name__ == '__main__':
             num_gpu_blocks_override=args.num_gpu_blocks_override or (model.max_model_len // 16),
             hf_token=True, # requires huggingface-cli login
             hf_overrides={"architectures": ["DeepseekVLV2ForCausalLM"]} if model.alias.startswith("deepseek-vl2") else None,
-            limit_mm_per_prompt={"image": 64} if args.multi_image else None
+            limit_mm_per_prompt=limit_mm_per_prompt,
+            disable_mm_preprocessor_cache=True,
+            max_num_seqs=1
         )
 
         requests = workload.requests
@@ -76,18 +86,37 @@ if __name__ == '__main__':
             modality_token_index = get_modality_token_index(request, model, multi_image=args.multi_image)
             final_prompt = prepare_final_prompt(request, model, multi_image=args.multi_image)
 
-            req_output = llm.generate(
+            req_outputs = llm.generate(
                 prompts=[final_prompt],
                 sampling_params=sampling_params,
                 use_tqdm=False
-            )[0]
+            )
 
             now = time.time()
-            outputs.append(
-                RequestOutput.from_vllm_output(
-                    request.id, req_output, modality_token_index
+            if req_outputs:
+                # Aborted request because prompt was longer than max model length
+                processed_inputs = llm.llm_engine.processor.input_preprocessor.preprocess(
+                    final_prompt,
+                    lora_request=None,
+                    prompt_adapter_request=None,
+                    return_mm_hashes=False,
                 )
-            )
+                prompt_token_ids = processed_inputs["prompt_token_ids"]
+                outputs.append(
+                    RequestOutput(
+                        request.id,
+                        len(prompt_token_ids),
+                        prompt_token_ids.count(modality_token_index),
+                        aborted=True
+                    )
+                )
+            else:
+                req_output = req_outputs[0]
+                outputs.append(
+                    RequestOutput.from_vllm_output(
+                        request.id, req_output, modality_token_index
+                    )
+                )
 
     finally:
         elapsed_time = now - start_time
