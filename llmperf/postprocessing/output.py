@@ -15,22 +15,22 @@ from llmperf.constants import EXPERIMENTS_LOG, EXPERIMENTS_OUTPUTS_DIR, EXPERIME
 @dataclass
 class RequestOutput:
     id: str
-    prompt_tokens_cnt: int
-    modality_tokens_cnt: int
-    decode_tokens_cnt: int
+    prompt_tokens_cnt: Optional[int] = 0
+    modality_tokens_cnt: Optional[int] = 0
+    decode_tokens_cnt: Optional[int] = 0
 
     # vLLM metrics
-    arrival_time: float
-    input_processed_time: float
-    last_token_time: float
-    first_scheduled_time: Optional[float]
-    first_token_time: Optional[float]
-    time_in_queue: Optional[float]
-    finished_time: Optional[float] = None
-    scheduler_time: Optional[float] = None
-    model_forward_time: Optional[float] = None
-    model_execute_time: Optional[float] = None
-    model_encoder_time: Optional[float] = None
+    arrival_time: Optional[float] = 0.0
+    input_processed_time: Optional[float] = 0.0
+    last_token_time: Optional[float] = 0.0
+    first_scheduled_time: Optional[float] = 0.0
+    first_token_time: Optional[float] = 0.0
+    time_in_queue: Optional[float] = 0.0
+    finished_time: Optional[float] = 0.0
+    scheduler_time: Optional[float] = 0.0
+    model_forward_time: Optional[float] = 0.0
+    model_execute_time: Optional[float] = 0.0
+    model_encoder_time: Optional[float] = 0.0
 
     # Metadata
     estimated_time: Optional[float] = None
@@ -44,7 +44,7 @@ class RequestOutput:
     
     @property
     def encoder_time(self) -> float:
-        return self.model_encoder_time or 0.0
+        return self.model_encoder_time
     
     @property
     def ttft(self) -> float:
