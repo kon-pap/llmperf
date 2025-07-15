@@ -20,6 +20,7 @@ class RequestOutput:
     decode_tokens_cnt: Optional[int] = 0
 
     # vLLM metrics
+    vllm_id: Optional[int] = 0
     arrival_time: Optional[float] = 0.0
     input_processed_time: Optional[float] = 0.0
     last_token_time: Optional[float] = 0.0
@@ -104,6 +105,7 @@ class RequestOutput:
             prompt_tokens_cnt=len(req_output.prompt_token_ids),
             modality_tokens_cnt=req_output.prompt_token_ids.count(modality_token_index),
             decode_tokens_cnt=len(req_output.outputs[0].token_ids),
+            vllm_id=req_output.request_id,
             arrival_time=req_output.metrics.arrival_time,
             input_processed_time=req_output.metrics.input_processed_time,
             last_token_time=req_output.metrics.last_token_time,
