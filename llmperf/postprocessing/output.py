@@ -37,6 +37,10 @@ class RequestOutput:
     category: Optional[str] = None
     stl: Optional[bool] = None
     aborted: Optional[bool] = None
+    uid: Optional[str] = None
+    slo: Optional[float] = None
+    ttft_slo: Optional[float] = None
+    tbt_slo: Optional[float] = None
 
     @property
     def processor_time(self) -> float:
@@ -87,6 +91,14 @@ class RequestOutput:
             category = md.category
             stl = md.stl
 
+        uid = slo = ttft_slo = tbt_slo = None
+
+        if (hasattr(req_output, "user_md")) and (umd := req_output.user_md):
+            uid = umd.uid
+            slo = umd.slo
+            ttft_slo = umd.ttft_slo
+            tbt_slo = umd.tbt_slo
+
         return cls(
             id=req_id,
             prompt_tokens_cnt=len(req_output.prompt_token_ids),
@@ -106,7 +118,11 @@ class RequestOutput:
             estimated_time=estimated_time,
             category=category,
             stl=stl,
-            aborted=aborted
+            aborted=aborted,
+            uid=uid,
+            slo=slo,
+            ttft_slo=ttft_slo,
+            tbt_slo=tbt_slo
         )
 
 @dataclass

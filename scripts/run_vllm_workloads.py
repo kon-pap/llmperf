@@ -7,6 +7,7 @@ from tqdm.asyncio import tqdm_asyncio
 
 from vllm import AsyncEngineArgs, RequestOutput as vllmRequestOutput, SamplingParams
 from vllm.v1.engine.async_llm import AsyncLLM
+from vllm.user_metadata import UserMetadata
 
 from llmperf.config.approaches import get_approach_by_alias
 from llmperf.config.models import get_model_by_alias
@@ -18,7 +19,7 @@ from llmperf.utils import create_experiment_id, get_modality_token_index, prepar
 llm = None
 model = None
 
-async def send_request(idx: int, request: Request, timestamp: float, max_tokens: int, multi_image: bool = False) -> vllmRequestOutput:
+async def send_request(idx: int, request: Request, timestamp: float, max_tokens: int, user_md: UserMetadata, multi_image: bool = False) -> vllmRequestOutput:
     await asyncio.sleep(timestamp)
 
     sampling_params = SamplingParams(
@@ -29,7 +30,7 @@ async def send_request(idx: int, request: Request, timestamp: float, max_tokens:
     final_prompt = prepare_final_prompt(request, model, multi_image=multi_image)
     
     final_output = None
-    async for output in llm.generate(final_prompt, sampling_params, str(idx)):
+    async for output in llm.generate(final_prompt, sampling_params, str(idx), user_md=user_md):
         final_output = output
 
     assert final_output is not None
@@ -80,11 +81,29 @@ async def main(args: argparse.Namespace):
         for request in requests:
             mt = profiling_data[request.id].decode_tokens_cnt
             max_tokens.append(mt)
+
+        user_md = [UserMetadata(uid="root", slo=0.0, ttft_slo=0.0, tbt_slo=0.0)] * len(requests)
+        if args.slo_aware:
+            # Create user metadata list
+            user_md = []
+            for request in requests:
+                e2e_latency = profiling_data[request.id].e2e
+                ttft_latency = profiling_data[request.id].ttft
+                tbt_latency = profiling_data[request.id].tbt
+                user_md.append(
+                    UserMetadata(
+                        uid="root",
+                        slo=e2e_latency * args.e2e_slo,
+                        ttft_slo=ttft_latency * args.ttft_slo,
+                        tbt_slo=tbt_latency * args.tbt_slo
+                    )
+                )
+
         
         outputs = []
         start_time = now = time.time()
         pending_requests = [
-            send_request(idx, request, ts, mt, args.multi_image) for idx, (request, ts, mt) in enumerate(zip(requests, timestamps, max_tokens))
+            send_request(idx, request, ts, mt, umd, args.multi_image) for idx, (request, ts, mt, umd) in enumerate(zip(requests, timestamps, max_tokens, user_md))
         ]
 
         request_outputs = []
@@ -165,6 +184,18 @@ def parse_args() -> argparse.Namespace:
     
     parser.add_argument("--multi-image", action="store_true",
                     help="Use multiple images instead of video")
+    
+    parser.add_argument("--slo-aware", action="store_true",
+                    help="Sends slo as user metadata")
+    
+    parser.add_argument("--e2e-slo", type=int, default=5,
+                    help="E2E SLO multiplier")
+    
+    parser.add_argument("--ttft-slo", type=int, default=6,
+                    help="TTFT SLO multiplier")
+    
+    parser.add_argument("--tbt-slo", type=int, default=5,
+                    help="TBT SLO multiplier")
     
     final_args = []
 
