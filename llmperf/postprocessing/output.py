@@ -211,3 +211,8 @@ class ExperimentOutput:
             for line in file:
                 entry = json.loads(line)
                 self.request_outputs.append(RequestOutput(**entry))
+
+        if self.elapsed_time is None:
+            start_time = min([ro.arrival_time for ro in self.request_outputs])
+            finish_time = max([ro.finished_time for ro in self.request_outputs])
+            self.elapsed_time = finish_time - start_time
