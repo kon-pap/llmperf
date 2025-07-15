@@ -93,7 +93,7 @@ if __name__ == '__main__':
             )
 
             now = time.time()
-            if req_outputs:
+            if req_outputs is None or len(req_outputs) < 1:
                 # Aborted request because prompt was longer than max model length
                 processed_inputs = llm.llm_engine.processor.input_preprocessor.preprocess(
                     final_prompt,
@@ -107,6 +107,7 @@ if __name__ == '__main__':
                         request.id,
                         len(prompt_token_ids),
                         prompt_token_ids.count(modality_token_index),
+                        int(output_length),
                         aborted=True
                     )
                 )
