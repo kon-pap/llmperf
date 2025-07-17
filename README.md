@@ -68,6 +68,8 @@ Donwload datasets separately or download a minimal version provided by us
 python scripts/create_static_workloads.py # Create {text,image,video,audio}-static workloads from the datasets
 python scripts/create_poisson_workloads.py # Create {text,mix}-poisson workloads using static workloads
 python scripts/create_gamma_workloads.py # Create {text,mix}-gamma workloads using static workloads
+python scripts/create_rps_workloads.py # Create rocks, pebbles, sand workloads using static workloads
+python scripts/create_multi_stream_workloads.py --workloads text-static image-static video-static --request-rates 0.05 0.1 0.25 0.5 0.75 1.0 1.25 1.5 1.75 2.0 2.5 3.0 3.5 4.0 5.0 6.0 8.0 10.0 # Create multi modalities workloads
 ```
 
 ## Experiments
