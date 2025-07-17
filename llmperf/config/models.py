@@ -69,7 +69,7 @@ MODELS = {
     ),
     Model(
         name="LLaVA-OneVision-7b",
-        path="llava-hf/llava-onevision-qwen2-7b-ov-chat-hf",
+        path=os.path.join(MODELS_DIR, "llava-onevision-qwen2-7b-ov-chat-hf"),
         max_model_len=32768,
         alias="llava-ov",
         image_token_index=151646,
@@ -77,7 +77,7 @@ MODELS = {
     ),
     Model(
         name="LLaVA-OneVision-500M",
-        path="llava-hf/llava-onevision-qwen2-0.5b-ov-hf",
+        path=os.path.join(MODELS_DIR, "llava-onevision-qwen2-0.5b-ov-hf"),
         max_model_len=32768,
         alias="llava-ov-small",
         image_token_index=151646,
@@ -85,7 +85,7 @@ MODELS = {
     ),
     Model(
         name="Qwen2.5-7B",
-        path="Qwen/Qwen2.5-VL-7B-Instruct",
+        path=os.path.join(MODELS_DIR, "Qwen2.5-VL-7B-Instruct"),
         max_model_len=128000,
         alias="qwen-2.5",
         image_token_index=151655,
@@ -93,7 +93,7 @@ MODELS = {
     ),
     Model(
         name="Qwen2.5-3B",
-        path="Qwen/Qwen2.5-VL-3B-Instruct",
+        path=os.path.join(MODELS_DIR, "Qwen2.5-VL-3B-Instruct"),
         max_model_len=128000,
         alias="qwen-2.5-small",
         image_token_index=151655,
@@ -117,14 +117,14 @@ MODELS = {
     ),
     Model(
         name="Gemma3-4B",
-        path="google/gemma-3-4b-it",
+        path=os.path.join(MODELS_DIR, "gemma-3-4b-it"),
         max_model_len=131072,
         alias="gemma-3-small",
         image_token_index=262144
     ),
     Model(
         name="Gemma3-12B",
-        path="google/gemma-3-12b-it",
+        path=os.path.join(MODELS_DIR, "gemma-3-12b-it"),
         max_model_len=131072,
         alias="gemma-3",
         image_token_index=262144
@@ -166,7 +166,7 @@ MODELS = {
     ),
     Model(
         name="Pixtral-12B",
-        path="mistral-community/pixtral-12b",
+        path=os.path.join(MODELS_DIR, "pixtral-12b"),
         max_model_len=131072,
         alias="pixtral",
         image_token_index=10
