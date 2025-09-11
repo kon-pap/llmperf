@@ -131,7 +131,10 @@ class RequestOutput:
 class EngineStats:
     timestamps: List[float]
     kv_cache_usage: List[float]
+    encoder_cache_usage: List[float]
     preemptions_req_ids: List[List[str]]
+    kv_cache_usage_per_category: List[dict[str,float]]
+    encoder_cache_usage_per_category: List[dict[str,float]]
 
     num_preemptions: List[int] = field(init=False)
 
@@ -185,7 +188,10 @@ class ExperimentOutput:
         self.engine_stats = EngineStats(
             timestamps=df["timestamp"].tolist(),
             kv_cache_usage=df["kv_cache_usage"].tolist(),
-            preemptions_req_ids=[list(arr) for arr in df["preempted_req_ids"].tolist()]
+            encoder_cache_usage=df["encoder_cache_usage"].tolist(),
+            preemptions_req_ids=[list(arr) for arr in df["preempted_req_ids"].tolist()],
+            kv_cache_usage_per_category=df["kv_cache_usage_per_category"].tolist(),
+            encoder_cache_usage_per_category=df["encoder_cache_usage_per_category"].tolist()
         )
 
     def save(self):
