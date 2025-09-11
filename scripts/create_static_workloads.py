@@ -9,13 +9,15 @@ if __name__ == '__main__':
         "Text Conversations",
         "Image Reasoning",
         "Video Description",
-        "Audio Captioning"
+        "Audio Captioning",
+        "Long Text Conversations"
     ]
     aliases = [
         "text-static",
         "image-static",
         "video-static",
-        "audio-static"
+        "audio-static",
+        "text-static-long"
     ]
 
     for name, alias in zip(names, aliases):
@@ -27,8 +29,8 @@ if __name__ == '__main__':
         for record in data:
             prompt = dataset.get_input() if name == "Audio Captioning" else dataset.get_input(record)
             response = dataset.get_output(record)
-            modality_path = dataset.get_modality_path(record) if name != "Text Conversations" else None
-            modality_size = dataset.get_modality_size(record) if name != "Text Conversations" else None
+            modality_path = dataset.get_modality_path(record) if "Text Conversations" not in name else None
+            modality_size = dataset.get_modality_size(record) if "Text Conversations" not in name else None
             
             if prompt and response:
                 request_args = {

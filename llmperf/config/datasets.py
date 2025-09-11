@@ -5,8 +5,8 @@ from dataclasses import dataclass, field
 from typing import Callable, Dict, List, LiteralString, Optional, Union
 
 from llmperf.constants import DATASETS_DIR
-from llmperf.preprocessing.input import get_clotho_input, get_llava_image_reasoning_input, get_llava_video_description_input, get_sharegpt_input
-from llmperf.preprocessing.output import get_clotho_output, get_llava_image_reasoning_output, get_llava_video_description_output, get_sharegpt_output
+from llmperf.preprocessing.input import get_clotho_input, get_llava_image_reasoning_input, get_llava_video_description_input, get_sharegpt_input, get_sharegpt_long_input
+from llmperf.preprocessing.output import get_clotho_output, get_llava_image_reasoning_output, get_llava_video_description_output, get_sharegpt_output, get_sharegpt_long_output
 from llmperf.preprocessing.modality_path import get_clotho_audio_path, get_llava_image_path, get_llava_video_path
 from llmperf.preprocessing.modality_size import get_audio_size, get_image_size, get_video_size
 
@@ -86,6 +86,15 @@ DATASETS = {
         get_output=get_clotho_output,
         _get_modality_path=get_clotho_audio_path,
         _get_modality_size=get_audio_size
+    ),
+    Dataset(
+        name="Long Text Conversations",
+        path=os.path.join(DATASETS_DIR, "ShareGPT"),
+        file="sharegpt.jsonl",
+        alias="text-conv-long",
+        color="#000000",
+        get_input=get_sharegpt_long_input,
+        get_output=get_sharegpt_long_output
     )
 }
 

@@ -92,6 +92,13 @@ _WORKLOADS_STATIC = {
         modalities="audio",
         modality_pct=1.0
     ),
+    Workload(
+        name="Long Text Conversations",
+        path=os.path.join(WORKLOADS_DIR, "static"),
+        alias="text-static-long",
+        modalities="text",
+        modality_pct=1.0
+    ),
 }
 
 # Text Conversations with Poisson | Varying request rate

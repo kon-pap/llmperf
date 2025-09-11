@@ -5,6 +5,13 @@ def get_sharegpt_output(record: Dict) -> Optional[str]:
         return None
     return record["conversations"][1]["value"]
 
+def get_sharegpt_long_output(record: Dict) -> Optional[str]:
+    if not (record["conversations"][0]["from"] == "human" and record["conversations"][-1]["from"] == "gpt"):
+        return None
+    if  len(record["conversations"]) < 6:
+        return None
+    return record["conversations"][-1]["value"]
+
 def get_llava_image_reasoning_output(record: Dict) -> Optional[str]:
     if not (record["conversations"][0]["from"] == "human" and record["conversations"][1]["from"] == "gpt"):
         return None
