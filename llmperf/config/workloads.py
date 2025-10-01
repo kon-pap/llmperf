@@ -319,6 +319,243 @@ _WORKLOADS_MULTI_STREAM_TIV = {
     for b, f, s in [(0.05, 0.05, 0.05), (0.1, 0.05, 0.05), (0.25, 0.05, 0.05), (0.5, 0.05, 0.05), (0.75, 0.05, 0.05), (1.0, 0.05, 0.05), (1.25, 0.05, 0.05), (1.5, 0.05, 0.05), (1.75, 0.05, 0.05), (2.0, 0.05, 0.05), (2.5, 0.05, 0.05), (3.0, 0.05, 0.05), (3.5, 0.05, 0.05), (4.0, 0.05, 0.05), (5.0, 0.05, 0.05), (6.0, 0.05, 0.05), (8.0, 0.05, 0.05), (0.05, 0.1, 0.05), (0.1, 0.1, 0.05), (0.25, 0.1, 0.05), (0.5, 0.1, 0.05), (0.75, 0.1, 0.05), (1.0, 0.1, 0.05), (1.25, 0.1, 0.05), (1.5, 0.1, 0.05), (1.75, 0.1, 0.05), (2.0, 0.1, 0.05), (2.5, 0.1, 0.05), (3.0, 0.1, 0.05), (3.5, 0.1, 0.05), (4.0, 0.1, 0.05), (5.0, 0.1, 0.05), (6.0, 0.1, 0.05), (8.0, 0.1, 0.05), (0.05, 0.25, 0.05), (0.1, 0.25, 0.05), (0.25, 0.25, 0.05), (0.5, 0.25, 0.05), (0.75, 0.25, 0.05), (1.0, 0.25, 0.05), (1.25, 0.25, 0.05), (1.5, 0.25, 0.05), (1.75, 0.25, 0.05), (2.0, 0.25, 0.05), (2.5, 0.25, 0.05), (3.0, 0.25, 0.05), (3.5, 0.25, 0.05), (4.0, 0.25, 0.05), (5.0, 0.25, 0.05), (6.0, 0.25, 0.05), (8.0, 0.25, 0.05), (0.05, 0.5, 0.05), (0.1, 0.5, 0.05), (0.25, 0.5, 0.05), (0.5, 0.5, 0.05), (0.75, 0.5, 0.05), (1.0, 0.5, 0.05), (1.25, 0.5, 0.05), (1.5, 0.5, 0.05), (1.75, 0.5, 0.05), (2.0, 0.5, 0.05), (2.5, 0.5, 0.05), (3.0, 0.5, 0.05), (3.5, 0.5, 0.05), (4.0, 0.5, 0.05), (5.0, 0.5, 0.05), (6.0, 0.5, 0.05), (8.0, 0.5, 0.05), (0.05, 0.75, 0.05), (0.1, 0.75, 0.05), (0.25, 0.75, 0.05), (0.5, 0.75, 0.05), (0.75, 0.75, 0.05), (1.0, 0.75, 0.05), (1.25, 0.75, 0.05), (1.5, 0.75, 0.05), (1.75, 0.75, 0.05), (2.0, 0.75, 0.05), (2.5, 0.75, 0.05), (3.0, 0.75, 0.05), (3.5, 0.75, 0.05), (4.0, 0.75, 0.05), (5.0, 0.75, 0.05), (6.0, 0.75, 0.05), (8.0, 0.75, 0.05), (0.05, 1.0, 0.05), (0.1, 1.0, 0.05), (0.25, 1.0, 0.05), (0.5, 1.0, 0.05), (0.75, 1.0, 0.05), (1.0, 1.0, 0.05), (1.25, 1.0, 0.05), (1.5, 1.0, 0.05), (1.75, 1.0, 0.05), (2.0, 1.0, 0.05), (2.5, 1.0, 0.05), (3.0, 1.0, 0.05), (3.5, 1.0, 0.05), (4.0, 1.0, 0.05), (5.0, 1.0, 0.05), (6.0, 1.0, 0.05), (8.0, 1.0, 0.05), (0.05, 0.05, 0.1), (0.1, 0.05, 0.1), (0.25, 0.05, 0.1), (0.5, 0.05, 0.1), (0.75, 0.05, 0.1), (1.0, 0.05, 0.1), (1.25, 0.05, 0.1), (1.5, 0.05, 0.1), (1.75, 0.05, 0.1), (2.0, 0.05, 0.1), (2.5, 0.05, 0.1), (3.0, 0.05, 0.1), (3.5, 0.05, 0.1), (4.0, 0.05, 0.1), (5.0, 0.05, 0.1), (6.0, 0.05, 0.1), (8.0, 0.05, 0.1), (0.05, 0.1, 0.1), (0.1, 0.1, 0.1), (0.25, 0.1, 0.1), (0.5, 0.1, 0.1), (0.75, 0.1, 0.1), (1.0, 0.1, 0.1), (1.25, 0.1, 0.1), (1.5, 0.1, 0.1), (1.75, 0.1, 0.1), (2.0, 0.1, 0.1), (2.5, 0.1, 0.1), (3.0, 0.1, 0.1), (3.5, 0.1, 0.1), (4.0, 0.1, 0.1), (5.0, 0.1, 0.1), (6.0, 0.1, 0.1), (8.0, 0.1, 0.1), (0.05, 0.25, 0.1), (0.1, 0.25, 0.1), (0.25, 0.25, 0.1), (0.5, 0.25, 0.1), (0.75, 0.25, 0.1), (1.0, 0.25, 0.1), (1.25, 0.25, 0.1), (1.5, 0.25, 0.1), (1.75, 0.25, 0.1), (2.0, 0.25, 0.1), (2.5, 0.25, 0.1), (3.0, 0.25, 0.1), (3.5, 0.25, 0.1), (4.0, 0.25, 0.1), (5.0, 0.25, 0.1), (6.0, 0.25, 0.1), (8.0, 0.25, 0.1), (0.05, 0.5, 0.1), (0.1, 0.5, 0.1), (0.25, 0.5, 0.1), (0.5, 0.5, 0.1), (0.75, 0.5, 0.1), (1.0, 0.5, 0.1), (1.25, 0.5, 0.1), (1.5, 0.5, 0.1), (1.75, 0.5, 0.1), (2.0, 0.5, 0.1), (2.5, 0.5, 0.1), (3.0, 0.5, 0.1), (3.5, 0.5, 0.1), (4.0, 0.5, 0.1), (5.0, 0.5, 0.1), (6.0, 0.5, 0.1), (8.0, 0.5, 0.1), (0.05, 0.75, 0.1), (0.1, 0.75, 0.1), (0.25, 0.75, 0.1), (0.5, 0.75, 0.1), (0.75, 0.75, 0.1), (1.0, 0.75, 0.1), (1.25, 0.75, 0.1), (1.5, 0.75, 0.1), (1.75, 0.75, 0.1), (2.0, 0.75, 0.1), (2.5, 0.75, 0.1), (3.0, 0.75, 0.1), (3.5, 0.75, 0.1), (4.0, 0.75, 0.1), (5.0, 0.75, 0.1), (6.0, 0.75, 0.1), (8.0, 0.75, 0.1), (0.05, 1.0, 0.1), (0.1, 1.0, 0.1), (0.25, 1.0, 0.1), (0.5, 1.0, 0.1), (0.75, 1.0, 0.1), (1.0, 1.0, 0.1), (1.25, 1.0, 0.1), (1.5, 1.0, 0.1), (1.75, 1.0, 0.1), (2.0, 1.0, 0.1), (2.5, 1.0, 0.1), (3.0, 1.0, 0.1), (3.5, 1.0, 0.1), (4.0, 1.0, 0.1), (5.0, 1.0, 0.1), (6.0, 1.0, 0.1), (8.0, 1.0, 0.1), (0.05, 0.05, 0.25), (0.1, 0.05, 0.25), (0.25, 0.05, 0.25), (0.5, 0.05, 0.25), (0.75, 0.05, 0.25), (1.0, 0.05, 0.25), (1.25, 0.05, 0.25), (1.5, 0.05, 0.25), (1.75, 0.05, 0.25), (2.0, 0.05, 0.25), (2.5, 0.05, 0.25), (3.0, 0.05, 0.25), (3.5, 0.05, 0.25), (4.0, 0.05, 0.25), (5.0, 0.05, 0.25), (6.0, 0.05, 0.25), (8.0, 0.05, 0.25), (0.05, 0.1, 0.25), (0.1, 0.1, 0.25), (0.25, 0.1, 0.25), (0.5, 0.1, 0.25), (0.75, 0.1, 0.25), (1.0, 0.1, 0.25), (1.25, 0.1, 0.25), (1.5, 0.1, 0.25), (1.75, 0.1, 0.25), (2.0, 0.1, 0.25), (2.5, 0.1, 0.25), (3.0, 0.1, 0.25), (3.5, 0.1, 0.25), (4.0, 0.1, 0.25), (5.0, 0.1, 0.25), (6.0, 0.1, 0.25), (8.0, 0.1, 0.25), (0.05, 0.25, 0.25), (0.1, 0.25, 0.25), (0.25, 0.25, 0.25), (0.5, 0.25, 0.25), (0.75, 0.25, 0.25), (1.0, 0.25, 0.25), (1.25, 0.25, 0.25), (1.5, 0.25, 0.25), (1.75, 0.25, 0.25), (2.0, 0.25, 0.25), (2.5, 0.25, 0.25), (3.0, 0.25, 0.25), (3.5, 0.25, 0.25), (4.0, 0.25, 0.25), (5.0, 0.25, 0.25), (6.0, 0.25, 0.25), (8.0, 0.25, 0.25), (0.05, 0.5, 0.25), (0.1, 0.5, 0.25), (0.25, 0.5, 0.25), (0.5, 0.5, 0.25), (0.75, 0.5, 0.25), (1.0, 0.5, 0.25), (1.25, 0.5, 0.25), (1.5, 0.5, 0.25), (1.75, 0.5, 0.25), (2.0, 0.5, 0.25), (2.5, 0.5, 0.25), (3.0, 0.5, 0.25), (3.5, 0.5, 0.25), (4.0, 0.5, 0.25), (5.0, 0.5, 0.25), (6.0, 0.5, 0.25), (8.0, 0.5, 0.25), (0.05, 0.75, 0.25), (0.1, 0.75, 0.25), (0.25, 0.75, 0.25), (0.5, 0.75, 0.25), (0.75, 0.75, 0.25), (1.0, 0.75, 0.25), (1.25, 0.75, 0.25), (1.5, 0.75, 0.25), (1.75, 0.75, 0.25), (2.0, 0.75, 0.25), (2.5, 0.75, 0.25), (3.0, 0.75, 0.25), (3.5, 0.75, 0.25), (4.0, 0.75, 0.25), (5.0, 0.75, 0.25), (6.0, 0.75, 0.25), (8.0, 0.75, 0.25), (0.05, 1.0, 0.25), (0.1, 1.0, 0.25), (0.25, 1.0, 0.25), (0.5, 1.0, 0.25), (0.75, 1.0, 0.25), (1.0, 1.0, 0.25), (1.25, 1.0, 0.25), (1.5, 1.0, 0.25), (1.75, 1.0, 0.25), (2.0, 1.0, 0.25), (2.5, 1.0, 0.25), (3.0, 1.0, 0.25), (3.5, 1.0, 0.25), (4.0, 1.0, 0.25), (5.0, 1.0, 0.25), (6.0, 1.0, 0.25), (8.0, 1.0, 0.25), (0.05, 0.05, 0.5), (0.1, 0.05, 0.5), (0.25, 0.05, 0.5), (0.5, 0.05, 0.5), (0.75, 0.05, 0.5), (1.0, 0.05, 0.5), (1.25, 0.05, 0.5), (1.5, 0.05, 0.5), (1.75, 0.05, 0.5), (2.0, 0.05, 0.5), (2.5, 0.05, 0.5), (3.0, 0.05, 0.5), (3.5, 0.05, 0.5), (4.0, 0.05, 0.5), (5.0, 0.05, 0.5), (6.0, 0.05, 0.5), (8.0, 0.05, 0.5), (0.05, 0.1, 0.5), (0.1, 0.1, 0.5), (0.25, 0.1, 0.5), (0.5, 0.1, 0.5), (0.75, 0.1, 0.5), (1.0, 0.1, 0.5), (1.25, 0.1, 0.5), (1.5, 0.1, 0.5), (1.75, 0.1, 0.5), (2.0, 0.1, 0.5), (2.5, 0.1, 0.5), (3.0, 0.1, 0.5), (3.5, 0.1, 0.5), (4.0, 0.1, 0.5), (5.0, 0.1, 0.5), (6.0, 0.1, 0.5), (8.0, 0.1, 0.5), (0.05, 0.25, 0.5), (0.1, 0.25, 0.5), (0.25, 0.25, 0.5), (0.5, 0.25, 0.5), (0.75, 0.25, 0.5), (1.0, 0.25, 0.5), (1.25, 0.25, 0.5), (1.5, 0.25, 0.5), (1.75, 0.25, 0.5), (2.0, 0.25, 0.5), (2.5, 0.25, 0.5), (3.0, 0.25, 0.5), (3.5, 0.25, 0.5), (4.0, 0.25, 0.5), (5.0, 0.25, 0.5), (6.0, 0.25, 0.5), (8.0, 0.25, 0.5), (0.05, 0.5, 0.5), (0.1, 0.5, 0.5), (0.25, 0.5, 0.5), (0.5, 0.5, 0.5), (0.75, 0.5, 0.5), (1.0, 0.5, 0.5), (1.25, 0.5, 0.5), (1.5, 0.5, 0.5), (1.75, 0.5, 0.5), (2.0, 0.5, 0.5), (2.5, 0.5, 0.5), (3.0, 0.5, 0.5), (3.5, 0.5, 0.5), (4.0, 0.5, 0.5), (5.0, 0.5, 0.5), (6.0, 0.5, 0.5), (8.0, 0.5, 0.5), (0.05, 0.75, 0.5), (0.1, 0.75, 0.5), (0.25, 0.75, 0.5), (0.5, 0.75, 0.5), (0.75, 0.75, 0.5), (1.0, 0.75, 0.5), (1.25, 0.75, 0.5), (1.5, 0.75, 0.5), (1.75, 0.75, 0.5), (2.0, 0.75, 0.5), (2.5, 0.75, 0.5), (3.0, 0.75, 0.5), (3.5, 0.75, 0.5), (4.0, 0.75, 0.5), (5.0, 0.75, 0.5), (6.0, 0.75, 0.5), (8.0, 0.75, 0.5), (0.05, 1.0, 0.5), (0.1, 1.0, 0.5), (0.25, 1.0, 0.5), (0.5, 1.0, 0.5), (0.75, 1.0, 0.5), (1.0, 1.0, 0.5), (1.25, 1.0, 0.5), (1.5, 1.0, 0.5), (1.75, 1.0, 0.5), (2.0, 1.0, 0.5), (2.5, 1.0, 0.5), (3.0, 1.0, 0.5), (3.5, 1.0, 0.5), (4.0, 1.0, 0.5), (5.0, 1.0, 0.5), (6.0, 1.0, 0.5), (8.0, 1.0, 0.5)]
 }
 
+_WORKLOADS_SMALL_BENCHMARK = {
+    Workload(
+        name="Text Only 1.0",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="text-only-1.0",
+        arrival_dist="poisson",
+        modalities="text",
+        modality_pct=1.0
+    ),
+    Workload(
+        name="Text Only 1.5",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="text-only-1.5",
+        arrival_dist="poisson",
+        modalities="text",
+        modality_pct=1.0
+    ),
+    Workload(
+        name="Text Only 2.0",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="text-only-2.0",
+        arrival_dist="poisson",
+        modalities="text",
+        modality_pct=1.0
+    ),
+    Workload(
+        name="Long Text Light 1.0",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="long-text-light-1.0",
+        arrival_dist="poisson",
+        modalities="text",
+        modality_pct=1.0
+    ),
+    Workload(
+        name="Long Text Light 1.5",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="long-text-light-1.5",
+        arrival_dist="poisson",
+        modalities="text",
+        modality_pct=1.0
+    ),
+    Workload(
+        name="Long Text Light 2.0",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="long-text-light-2.0",
+        arrival_dist="poisson",
+        modalities="text",
+        modality_pct=1.0
+    ),
+    Workload(
+        name="Image Light 1.0",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="image-light-1.0",
+        arrival_dist="poisson",
+        modalities=["text", "image"],
+        modality_pct=[0.8, 0.2],
+        modality_dist="categorical"
+    ),
+    Workload(
+        name="Image Light 1.5",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="image-light-1.5",
+        arrival_dist="poisson",
+        modalities=["text", "image"],
+        modality_pct=[0.8, 0.2],
+        modality_dist="categorical"
+    ),
+    Workload(
+        name="Image Light 2.0",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="image-light-2.0",
+        arrival_dist="poisson",
+        modalities=["text", "image"],
+        modality_pct=[0.8, 0.2],
+        modality_dist="categorical"
+    ),
+    Workload(
+        name="Video Light 1.0",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="video-light-1.0",
+        arrival_dist="poisson",
+        modalities=["text", "video"],
+        modality_pct=[0.95, 0.05],
+        modality_dist="categorical"
+    ),
+    Workload(
+        name="Video Light 1.5",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="video-light-1.5",
+        arrival_dist="poisson",
+        modalities=["text", "video"],
+        modality_pct=[0.95, 0.05],
+        modality_dist="categorical"
+    ),
+    Workload(
+        name="Video Light 2.0",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="video-light-2.0",
+        arrival_dist="poisson",
+        modalities=["text", "video"],
+        modality_pct=[0.95, 0.05],
+        modality_dist="categorical"
+    ),
+    Workload(
+        name="Long Text Heavy 1.0",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="long-text-heavy-1.0",
+        arrival_dist="poisson",
+        modalities="text",
+        modality_pct=1.0
+    ),
+    Workload(
+        name="Long Text Heavy 1.5",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="long-text-heavy-1.5",
+        arrival_dist="poisson",
+        modalities="text",
+        modality_pct=1.0
+    ),
+    Workload(
+        name="Long Text Heavy 2.0",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="long-text-heavy-2.0",
+        arrival_dist="poisson",
+        modalities="text",
+        modality_pct=1.0
+    ),
+    Workload(
+        name="Image Heavy 1.0",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="image-heavy-1.0",
+        arrival_dist="poisson",
+        modalities=["text", "image"],
+        modality_pct=[0.6, 0.4],
+        modality_dist="categorical"
+    ),
+    Workload(
+        name="Image Heavy 1.5",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="image-heavy-1.5",
+        arrival_dist="poisson",
+        modalities=["text", "image"],
+        modality_pct=[0.6, 0.4],
+        modality_dist="categorical"
+    ),
+    Workload(
+        name="Image Heavy 2.0",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="image-heavy-2.0",
+        arrival_dist="poisson",
+        modalities=["text", "image"],
+        modality_pct=[0.6, 0.4],
+        modality_dist="categorical"
+    ),
+    Workload(
+        name="Video Heavy 1.0",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="video-heavy-1.0",
+        arrival_dist="poisson",
+        modalities=["text", "video"],
+        modality_pct=[0.9, 0.1],
+        modality_dist="categorical"
+    ),
+    Workload(
+        name="Video Heavy 1.5",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="video-heavy-1.5",
+        arrival_dist="poisson",
+        modalities=["text", "video"],
+        modality_pct=[0.9, 0.1],
+        modality_dist="categorical"
+    ),
+    Workload(
+        name="Video Heavy 2.0",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="video-heavy-2.0",
+        arrival_dist="poisson",
+        modalities=["text", "video"],
+        modality_pct=[0.9, 0.1],
+        modality_dist="categorical"
+    ),
+    Workload(
+        name="Mixed Light 1.0",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="mixed-light-1.0",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video"],
+        modality_pct=[0.85, 0.1, 0.05],
+        modality_dist="categorical"
+    ),
+    Workload(
+        name="Mixed Light 1.5",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="mixed-light-1.5",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video"],
+        modality_pct=[0.85, 0.1, 0.05],
+        modality_dist="categorical"
+    ),
+    Workload(
+        name="Mixed Light 2.0",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="mixed-light-2.0",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video"],
+        modality_pct=[0.85, 0.1, 0.05],
+        modality_dist="categorical"
+    ),
+    Workload(
+        name="Mixed Heavy 1.0",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="mixed-heavy-1.0",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video"],
+        modality_pct=[0.7, 0.2, 0.1],
+        modality_dist="categorical"
+    ),
+    Workload(
+        name="Mixed Heavy 1.5",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="mixed-heavy-1.5",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video"],
+        modality_pct=[0.7, 0.2, 0.1],
+        modality_dist="categorical"
+    ),
+    Workload(
+        name="Mixed Heavy 2.0",
+        path=os.path.join(WORKLOADS_DIR, "small-benchmark"),
+        alias="mixed-heavy-2.0",
+        arrival_dist="poisson",
+        modalities=["text", "image", "video"],
+        modality_pct=[0.7, 0.2, 0.1],
+        modality_dist="categorical"
+    )
+}
+
 WORKLOADS = _WORKLOADS_STATIC | \
     _WORKLOADS_TEXT_POISSON | \
     _WORKLOADS_MIX_POISSON_15 | \
@@ -335,7 +572,8 @@ WORKLOADS = _WORKLOADS_STATIC | \
     _WORKLOADS_MULTI_STREAM_I | \
     _WORKLOADS_MULTI_STREAM_V | \
     _WORKLOADS_MULTI_STREAM_TI | \
-    _WORKLOADS_MULTI_STREAM_TIV
+    _WORKLOADS_MULTI_STREAM_TIV | \
+    _WORKLOADS_SMALL_BENCHMARK
 
 def get_workload_by_name(name: str) -> Union[None, Workload]:
     for workload in WORKLOADS:
