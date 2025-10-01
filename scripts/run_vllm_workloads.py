@@ -62,7 +62,9 @@ async def main(args: argparse.Namespace):
             disable_log_stats = False,
             max_model_len=args.max_model_len,
             max_num_batched_tokens=args.max_num_batched_tokens,
-            num_gpu_blocks_override=args.num_gpu_blocks_override
+            num_gpu_blocks_override=args.num_gpu_blocks_override,
+            max_num_encoder_input_tokens=args.max_num_encoder_input_tokens,
+            encoder_cache_size=args.num_encoder_tokens_override
         )
 
         global llm
@@ -178,6 +180,11 @@ def parse_args() -> argparse.Namespace:
                         help="Maximum number of batched tokens per iteration")
     parser.add_argument("--num-gpu-blocks-override", type=int, default=None,
                         help="Number of GPU blocks")
+    
+    parser.add_argument("--max-num-encoder-input-tokens", type=int, default=None,
+                        help="Maximum number of encoder input tokens per iteration")
+    parser.add_argument("--num-encoder-tokens-override", type=int, default=None,
+                        help="Number of encoder cache tokens")
     
     parser.add_argument("--profiling-data", nargs="+", type=str, required=True,
                         help="List of experiment output ids")
