@@ -11,6 +11,8 @@ if TYPE_CHECKING:
     from vllm import RequestOutput as vllmRequestOutput
 
 from llmperf.constants import EXPERIMENTS_LOG, EXPERIMENTS_OUTPUTS_DIR, EXPERIMENTS_ENGINE_STATS_DIR
+from llmperf.postprocessing.aggregator import Aggregator
+from llmperf.postprocessing.filter import Filter
 
 @dataclass
 class RequestOutput:
@@ -173,6 +175,135 @@ class ExperimentOutput:
     def tokens_per_second(self) -> float:
         return self.total_num_tokens / self.elapsed_time
 
+    def _latency(self, type: str, method: str = "mean", filter: Filter = None) -> float:
+        if filter is None:
+            filter = Filter()
+
+        request_latencies = []
+        for ro in self.request_outputs:
+            if not filter.include(ro):
+                continue
+            if type == "normalized":
+                request_latencies.append(ro.e2e / ro.decode_tokens_cnt)
+            else:
+                request_latencies.append(getattr(ro, type))
+        
+        return Aggregator.aggregate(request_latencies, method)
+
+    def normalized_latency(self, method: str = "mean", filter: Filter = None) -> float:
+        return self._latency("normalized", method, filter)
+
+    def ttft_latency(self, method: str = "mean", filter: Filter = None) -> float:
+        return self._latency("ttft", method, filter)
+
+    def e2e_latency(self, method: str = "mean", filter: Filter = None) -> float:
+        return self._latency("e2e", method, filter)
+
+    def tbt_latency(self, method: str = "mean", filter: Filter = None) -> float:
+        return self._latency("tbt", method, filter)
+    
+    def _slo_attainment(self, latency_attr: str, slo_attr: str, filter: Filter = None, slo_map: dict[str, float] = None) -> float:
+        if filter is None:
+            filter = Filter()
+        if slo_map is None:
+            slo_map = {}
+
+        filtered_cnt = 0
+        attained_cnt = 0
+        for ro in self.request_outputs:
+            if not filter.include(ro):
+                continue
+
+            filtered_cnt += 1
+
+            slo = getattr(ro, slo_attr)
+            if slo is None or slo == 0.0:
+                slo = slo_map.get(ro.id, float("inf"))
+
+            if getattr(ro, latency_attr) <= slo:
+                attained_cnt += 1
+
+        return attained_cnt / filtered_cnt * 100 if filtered_cnt else 0.0
+
+
+    def e2e_slo_attainment(self, filter: Filter = None, slo_map: dict[str, float] = None) -> float:
+        return self._slo_attainment("e2e", "slo", filter, slo_map)
+
+    def tbt_slo_attainment(self, filter: Filter = None, slo_map: dict[str, float] = None) -> float:
+        return self._slo_attainment("tbt", "tbt_slo", filter, slo_map)
+
+    def ttft_slo_attainment(self, filter: Filter = None, slo_map: dict[str, float] = None) -> float:
+        return self._slo_attainment("ttft", "ttft_slo", filter, slo_map)
+    
+    def throughput(self, filter: Filter = None) -> float:
+        if filter is None:
+            filter = Filter()
+
+        request_cnt = 0
+        start_time = float("inf")
+        finished_time = 0
+        for ro in self.request_outputs:
+            if not filter.include(ro):
+                continue
+            start_time = min(start_time, ro.arrival_time)
+            finished_time = max(finished_time, ro.finished_time)
+            request_cnt += 1
+        
+        return (finished_time - start_time) / request_cnt if request_cnt else 0
+    
+    def goodput(self, filter: Filter = None, slo_map: dict[str, float] = None) -> float:
+        if filter is None:
+            filter = Filter()
+        if slo_map is None:
+            slo_map = {}
+
+        attained_cnt = 0
+        start_time = float("inf")
+        finished_time = 0
+        for ro in self.request_outputs:
+            if not filter.include(ro):
+                continue
+
+            slo = ro.slo
+            if slo is None:
+                slo = slo_map.get(ro.id, float("inf"))
+
+            # TODO: Rethink goodput SLO definition (TTFT?, TBT?)
+            if ro.e2e <= slo:
+                attained_cnt += 1
+
+            start_time = min(start_time, ro.arrival_time)
+            finished_time = max(finished_time, ro.finished_time)
+
+        return (finished_time - start_time) / attained_cnt if attained_cnt else 0
+
+    def preemptions(self, filter: Filter = None) -> int:
+        if filter is None:
+            return sum(self.engine_stats.num_preemptions)
+        
+        req_id_to_ro = { ro.vllm_id: ro for ro in self.request_outputs }
+
+        num_preemptions = 0
+        for preemptions_req_ids in self.engine_stats.preemptions_req_ids:
+            for req_id in preemptions_req_ids:
+               if not filter.include(req_id_to_ro[req_id]):
+                   continue
+               num_preemptions += 1
+               
+        return num_preemptions
+    
+    def aborted(self, filter: Filter = None) -> int:
+        if filter is None:
+            filter = Filter()
+        
+        aborted = 0
+        for ro in self.request_outputs:
+            if not filter.include(ro):
+                continue
+            if ro.aborted:
+                aborted += 1
+               
+        return aborted
 
     def save_engine_stats(self, log_file: Union[str,LiteralString]):
         path = os.path.join(self.engine_stats_path or EXPERIMENTS_ENGINE_STATS_DIR, f"{self.id}.parquet")
