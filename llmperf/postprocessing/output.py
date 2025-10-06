@@ -135,6 +135,7 @@ class EngineStats:
     kv_cache_usage: List[float]
     encoder_cache_usage: List[float]
     preemptions_req_ids: List[List[str]]
+    rescheduled_req_ids: List[List[str]]
     kv_cache_usage_per_category: List[dict[str,float]]
     encoder_cache_usage_per_category: List[dict[str,float]]
 
@@ -152,6 +153,12 @@ class ExperimentOutput:
     output_log_path: Optional[Union[str,LiteralString]] = None
     engine_stats_path: Optional[Union[str,LiteralString]] = None
     engine_stats: Optional[EngineStats] = None
+
+    LATENCY_SLO_MAP = {
+        "e2e": ("e2e", "slo"),
+        "tbt": ("tbt", "tbt_slo"),
+        "ttft": ("ttft", "ttft_slo"),
+    }
 
     @property
     def num_requests(self) -> int:
@@ -202,6 +209,118 @@ class ExperimentOutput:
     def tbt_latency(self, method: str = "mean", filter: Filter = None) -> float:
         return self._latency("tbt", method, filter)
     
+    def tiq_latency(self, method: str = "mean", filter: Filter = None) -> float:
+        return self._latency("time_in_queue", method, filter)
+    
+    def preemption_latency(self, method: str = "mean", filter: Filter = None) -> float:
+        if filter is None:
+            filter = Filter()
+
+        preemption_deltas = {ro.id: [] for ro in self.request_outputs if filter.include(ro)}
+        req_id_to_ro = { ro.id: ro for ro in self.request_outputs }
+
+        active_preemptions = {}
+
+        timestamps = self.engine_stats.timestamps
+        preempted_lists = self.engine_stats.preemptions_req_ids
+        rescheduled_lists = self.engine_stats.rescheduled_req_ids
+
+        for ts, preempted, rescheduled in zip(timestamps, preempted_lists, rescheduled_lists):
+            # Handle new preemptions (start of preemption)
+            for req_id in preempted:
+                if req_id in preemption_deltas and req_id not in active_preemptions:
+                    active_preemptions[req_id] = ts
+
+            # Handle reschedules (end of preemption)
+            for req_id in rescheduled:
+                if req_id in active_preemptions:
+                    start = active_preemptions.pop(req_id)
+                    delta = ts - start
+                    preemption_deltas[req_id].append(delta)
+                else:
+                    print("Something went wrong")
+
+        assert not active_preemptions
+
+        preemption_latencies = []
+        for req_id, deltas in preemption_deltas.values():
+            ro = req_id_to_ro[req_id]
+            if not filter.include(ro):
+                continue
+            preemption_latencies.append(sum(deltas))
+        
+        return Aggregator.aggregate(preemption_latencies, method)
+    
+    def latency_slo_delta(self, latency_type: str = "e2e", method: str = "mean", filter: Filter = None) -> float:
+        if filter is None:
+            filter = Filter()
+        latency_attr, slo_attr = self.LATENCY_SLO_MAP[latency_type]
+
+        request_deltas = []
+        for ro in self.request_outputs:
+            if not filter.include(ro):
+                continue
+             # latency - slo thres
+            latency = getattr(ro, latency_attr)
+            slo = getattr(ro, slo_attr)
+            request_deltas.append(latency - slo)
+
+        return Aggregator.aggregate(request_deltas, method)
+
+    def slo_headroom(self, latency_type: str = "e2e", method: str = "mean", filter: Filter = None) -> float:
+        if filter is None:
+            filter = Filter()
+        latency_attr, slo_attr = self.LATENCY_SLO_MAP[latency_type]
+
+        request_headrooms = []
+        for ro in self.request_outputs:
+            if not filter.include(ro):
+                continue
+            latency = getattr(ro, latency_attr)
+            slo = getattr(ro, slo_attr)
+
+            # slo thres - latency (for negative deltas = for positive headrooms)
+            headroom = slo - latency
+            if headroom > 0:
+                request_headrooms.append(headroom)
+
+        return Aggregator.aggregate(request_headrooms, method)
+
+    def slo_violation(self, latency_type: str = "e2e", method: str = "mean", filter: Filter = None) -> float:
+        if filter is None:
+            filter = Filter()
+        latency_attr, slo_attr = self.LATENCY_SLO_MAP[latency_type]
+
+        request_violations = []
+        for ro in self.request_outputs:
+            if not filter.include(ro):
+                continue
+            latency = getattr(ro, latency_attr)
+            slo = getattr(ro, slo_attr)
+
+            # latency - slo thres (for positive deltas = for negative headrooms)
+            violation = latency - slo
+            if violation > 0:
+                request_violations.append(violation)
+
+        return Aggregator.aggregate(request_violations, method)
+
+    def slo_violations(self, latency_type: str = "e2e", filter: Filter = None) -> int:
+        if filter is None:
+            filter = Filter()
+        latency_attr, slo_attr = self.LATENCY_SLO_MAP[latency_type]
+
+        num_violations = 0
+        for ro in self.request_outputs:
+            if not filter.include(ro):
+                continue
+            latency = getattr(ro, latency_attr)
+            slo = getattr(ro, slo_attr)
+            if latency > slo:
+                num_violations += 1
+
+        return num_violations
+
     def _slo_attainment(self, latency_attr: str, slo_attr: str, filter: Filter = None, slo_map: dict[str, float] = None) -> float:
         if filter is None:
             filter = Filter()
