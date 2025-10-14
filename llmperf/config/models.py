@@ -102,7 +102,7 @@ MODELS = {
     Model(
         name="Qwen2-7B",
         path="Qwen/Qwen2-VL-7B-Instruct",
-        max_model_len=128000,
+        max_model_len=32768,
         alias="qwen-2",
         image_token_index=151655,
         video_token_index=151656
