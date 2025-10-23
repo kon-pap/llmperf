@@ -21,6 +21,7 @@ class RequestOutput:
     prompt_tokens_cnt: Optional[int] = 0
     modality_tokens_cnt: Optional[int] = 0
     decode_tokens_cnt: Optional[int] = 0
+    outputs: Optional[List[str]] = field(default_factory=list)
 
     # vLLM metrics
     vllm_id: Optional[int] = 0
@@ -111,6 +112,7 @@ class RequestOutput:
             prompt_tokens_cnt=len(req_output.prompt_token_ids),
             modality_tokens_cnt=req_output.prompt_token_ids.count(modality_token_index),
             decode_tokens_cnt=len(req_output.outputs[0].token_ids),
+            outputs=[co.text for co in req_output.outputs],
             vllm_id=req_output.request_id,
             arrival_time=req_output.metrics.arrival_time,
             input_processed_time=req_output.metrics.input_processed_time,
