@@ -4,6 +4,7 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 
+from collections import defaultdict
 from dataclasses import asdict, dataclass, field
 from typing import List, LiteralString, Optional, Union, TYPE_CHECKING
 
@@ -218,38 +219,52 @@ class ExperimentOutput:
         if filter is None:
             filter = Filter()
 
-        preemption_deltas = {ro.id: [] for ro in self.request_outputs if filter.include(ro)}
-        req_id_to_ro = { ro.id: ro for ro in self.request_outputs }
+        filtered_req_ids = {ro.vllm_id for ro in self.request_outputs if filter.include(ro)}
 
-        active_preemptions = {}
+        preemptions = []
+        for preempted_ids, preempted_ts in zip(self.engine_stats.preempted_req_ids, self.engine_stats.preempted_req_ts):
+            for req_id, ts in zip(preempted_ids, preempted_ts):
+                preemptions.append((req_id, ts))
 
-        timestamps = self.engine_stats.timestamps
-        preempted_lists = self.engine_stats.preemptions_req_ids
-        rescheduled_lists = self.engine_stats.rescheduled_req_ids
+        reschedules = []
+        for rescheduled_ids, rescheduled_ts in zip(self.engine_stats.rescheduled_req_ids, self.engine_stats.rescheduled_req_ts):
+            for req_id, ts in zip(rescheduled_ids, rescheduled_ts):
+                reschedules.append((req_id, ts))
 
-        for ts, preempted, rescheduled in zip(timestamps, preempted_lists, rescheduled_lists):
-            # Handle new preemptions (start of preemption)
-            for req_id in preempted:
-                if req_id in preemption_deltas and req_id not in active_preemptions:
-                    active_preemptions[req_id] = ts
+        preempted_dict = defaultdict(list)
+        for req_id, ts in preemptions:
+            preempted_dict[req_id].append(ts)
 
-            # Handle reschedules (end of preemption)
-            for req_id in rescheduled:
-                if req_id in active_preemptions:
-                    start = active_preemptions.pop(req_id)
-                    delta = ts - start
+        rescheduled_dict = defaultdict(list)
+        for req_id, ts in reschedules:
+            rescheduled_dict[req_id].append(ts)
+
+        for req_id in preempted_dict:
+            preempted_dict[req_id].sort()
+        
+        for req_id in rescheduled_dict:
+            rescheduled_dict[req_id].sort()
+
+        preemption_deltas = defaultdict(list)
+        for req_id, pre_ts_list in preempted_dict.items():
+            if req_id not in rescheduled_dict:
+                continue
+
+            res_ts_list = rescheduled_dict[req_id]
+            res_idx = 0
+
+            for pre_ts in pre_ts_list:
+                while res_idx < len(res_ts_list) and res_ts_list[res_idx] <= pre_ts:
+                    res_idx += 1
+                if res_idx < len(res_ts_list):
+                    delta = res_ts_list[res_idx] - pre_ts
                     preemption_deltas[req_id].append(delta)
-                else:
-                    print("Something went wrong")
-
-        assert not active_preemptions
+                    res_idx += 1
 
         preemption_latencies = []
-        for req_id, deltas in preemption_deltas.values():
-            ro = req_id_to_ro[req_id]
-            if not filter.include(ro):
-                continue
-            preemption_latencies.append(sum(deltas))
+        for req_id, deltas in preemption_deltas.items():
+            if req_id in filtered_req_ids:
+                preemption_latencies.append(sum(deltas))
         
         return Aggregator.aggregate(preemption_latencies, method)
     
