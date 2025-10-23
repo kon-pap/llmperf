@@ -48,9 +48,7 @@ BASELINE_MAP = {
     "v0.0.1.naive-slo-aware": "naive-e2e-slo-aware",
     "v0.0.2.naive-slo-aware": "naive-ttft-slo-aware",
     "v0.0.1.naive-mlq": "naive-mlq",
-    "wip": "mlq-lkv",
-    "wip-ii": "mlq-sof",
-    "wip-iii": "mlq-mkv"
+    "wip": "wip"
 }
 
 BASELINE_NAME_MAP = {
@@ -59,19 +57,21 @@ BASELINE_NAME_MAP = {
     "naive-e2e-slo-aware": "Naive E2E SLO-Aware",
     "naive-ttft-slo-aware": "Naive TTFT SLO-Aware",
     "naive-mlq": "Naive MLQ",
-    "mlq-lkv": "MLQ-LKV",
-    "mlq-sof": "MLQ-SOF",
-    "mlq-mkv": "MLQ-MKV"
+    "wip": "WIP"
 }
 
 MEMORY_MAP = {
     "blocksdef": "max",
+    "blocks2048": "2048",
+    "blocks1024": "1024",
     "blocks512": "512",
     "blocks256": "256"
 }
 
 MEMORY_NAME_MAP = {
     "max": "Max Memory",
+    "2048": "2048 Blocks",
+    "1024": "1024 Blocks",
     "512": "512 Blocks",
     "256": "256 Blocks"
 }
@@ -82,9 +82,7 @@ COLOR_MAP = {
     "naive-e2e-slo-aware": "#e5ae38",
     "naive-ttft-slo-aware": "#6d904f",
     "naive-mlq": "#810f7c",
-    "mlq-lkv": "#8b8b8b",
-    "mlq-sof": "#810f7c",
-    "mlq-mkv": "#000000"
+    "wip": "#000000"
 }
 
 ID_MAP = {
@@ -198,13 +196,13 @@ def plot_single_report(input_paths, out_path, rows, cols):
 def plot_reports(memory_configs):
     # Normalize Latency Reports
     for memory in memory_configs:
-        prefixes = ["", "p50", "p90", "p99"]
+        suffixes = ["", "p50", "p90", "p99"]
         categories = ["", "sand", "pebbles", "rocks"]
 
         image_files = [
             f"normlat_{'_'.join(filter(None, [cat, suf]))}_{memory}.pdf".replace("__", "_")
             for cat in categories
-            for suf in prefixes
+            for suf in suffixes
         ]
 
         image_paths = [os.path.join(FIGURES_DIR, "benchmark", file) for file in image_files]
@@ -213,42 +211,178 @@ def plot_reports(memory_configs):
 
     # TTFT Latency Reports
     for memory in memory_configs:
-        prefixes = ["", "p50", "p90", "p99"]
+        suffixes = ["", "p50", "p90", "p99"]
         categories = ["", "sand", "pebbles", "rocks"]
 
         image_files = [
             f"ttft_{'_'.join(filter(None, [cat, suf]))}_{memory}.pdf".replace("__", "_")
             for cat in categories
-            for suf in prefixes
+            for suf in suffixes
         ]
 
         image_paths = [os.path.join(FIGURES_DIR, "benchmark", file) for file in image_files]
         report_path = os.path.join(FIGURES_DIR, "reports", f"ttft_{memory}.pdf")
         plot_single_report(image_paths, report_path, 4, 4)
 
-    # Throughput Reports
+    # Throughput Reports | Aborted | Preemptions Reports
     for memory in memory_configs:
+        metrics = ["tp", "aborted", "preemptions"]
         categories = ["", "sand", "pebbles", "rocks"]
 
-        image_files = [f"tp_{cat}_{memory}.pdf".replace("__", "_") for cat in categories]
+        image_files = [f"{metric}_{cat}_{memory}.pdf".replace("__", "_") for metric in metrics for cat in categories ]
 
         image_paths = [os.path.join(FIGURES_DIR, "benchmark", file) for file in image_files]
         report_path = os.path.join(FIGURES_DIR, "reports", f"tp_{memory}.pdf")
-        plot_single_report(image_paths, report_path, 1, 4)
+        plot_single_report(image_paths, report_path, 3, 4)
 
-    # E2E SLO | TTFT SLO | Aborted | Preemptions Reports
+    # E2E SLO | Num of E2E SLO Violations | TTFT SLO | Num of TTFT SLO Violations
     for memory in memory_configs:
-        metrics = ["e2e_slo", "ttft_slo", "aborted", "preemptions"]
+        metrics = ["e2e_slo", "e2e_slo_violations", "ttft_slo", "ttft_slo_violations"]
         categories = ["", "sand", "pebbles", "rocks"]
 
         image_files = [
             f"{metric}{'_' + cat if cat else ''}_{memory}.pdf"
-            for cat in categories
             for metric in metrics
+            for cat in categories
         ]
 
         image_paths = [os.path.join(FIGURES_DIR, "benchmark", file) for file in image_files]
         report_path = os.path.join(FIGURES_DIR, "reports", f"slo_{memory}.pdf")
+        plot_single_report(image_paths, report_path, 4, 4)
+
+    # Time in Queue Latency Reports
+    for memory in memory_configs:
+        suffixes = ["", "p50", "p90", "p99"]
+        categories = ["", "sand", "pebbles", "rocks"]
+
+        image_files = [
+            f"tiqlat_{'_'.join(filter(None, [cat, suf]))}_{memory}.pdf".replace("__", "_")
+            for cat in categories
+            for suf in suffixes
+        ]
+
+        image_paths = [os.path.join(FIGURES_DIR, "benchmark", file) for file in image_files]
+        report_path = os.path.join(FIGURES_DIR, "reports", f"tiqlat_{memory}.pdf")
+        plot_single_report(image_paths, report_path, 4, 4)
+
+    # Preemption Latency Reports
+    for memory in memory_configs:
+        suffixes = ["", "p50", "p90", "p99"]
+        categories = ["", "sand", "pebbles", "rocks"]
+    
+        image_files = [
+            f"prelat_{'_'.join(filter(None, [cat, suf]))}_{memory}.pdf".replace("__", "_")
+            for cat in categories
+            for suf in suffixes
+        ]
+    
+        image_paths = [os.path.join(FIGURES_DIR, "benchmark", file) for file in image_files]
+        report_path = os.path.join(FIGURES_DIR, "reports", f"prelat_{memory}.pdf")
+        plot_single_report(image_paths, report_path, 4, 4)
+
+    # Relative Delay Reports
+    for memory in memory_configs:
+        suffixes = ["", "p50", "p90", "p99"]
+        categories = ["", "sand", "pebbles", "rocks"]
+    
+        image_files = [
+            f"reldel_{'_'.join(filter(None, [cat, suf]))}_{memory}.pdf".replace("__", "_")
+            for cat in categories
+            for suf in suffixes
+        ]
+    
+        image_paths = [os.path.join(FIGURES_DIR, "benchmark", file) for file in image_files]
+        report_path = os.path.join(FIGURES_DIR, "reports", f"reldel_{memory}.pdf")
+        plot_single_report(image_paths, report_path, 4, 4)
+
+    # TTFT SLO Delta Reports
+    for memory in memory_configs:
+        suffixes = ["", "p50", "p90", "p99"]
+        categories = ["", "sand", "pebbles", "rocks"]
+
+        image_files = [
+            f"ttft_slo_delta_{'_'.join(filter(None, [cat, suf]))}_{memory}.pdf".replace("__", "_")
+            for cat in categories
+            for suf in suffixes
+        ]
+
+        image_paths = [os.path.join(FIGURES_DIR, "benchmark", file) for file in image_files]
+        report_path = os.path.join(FIGURES_DIR, "reports", f"ttft_slo_delta_{memory}.pdf")
+        plot_single_report(image_paths, report_path, 4, 4)
+
+    # E2E SLO Delta Reports
+    for memory in memory_configs:
+        suffixes = ["", "p50", "p90", "p99"]
+        categories = ["", "sand", "pebbles", "rocks"]
+
+        image_files = [
+            f"e2e_slo_delta_{'_'.join(filter(None, [cat, suf]))}_{memory}.pdf".replace("__", "_")
+            for cat in categories
+            for suf in suffixes
+        ]
+
+        image_paths = [os.path.join(FIGURES_DIR, "benchmark", file) for file in image_files]
+        report_path = os.path.join(FIGURES_DIR, "reports", f"e2e_slo_delta_{memory}.pdf")
+        plot_single_report(image_paths, report_path, 4, 4)
+
+    # TTFT SLO Headroom Reports
+    for memory in memory_configs:
+        suffixes = ["", "p50", "p90", "p99"]
+        categories = ["", "sand", "pebbles", "rocks"]
+
+        image_files = [
+            f"ttft_slo_headroom_{'_'.join(filter(None, [cat, suf]))}_{memory}.pdf".replace("__", "_")
+            for cat in categories
+            for suf in suffixes
+        ]
+
+        image_paths = [os.path.join(FIGURES_DIR, "benchmark", file) for file in image_files]
+        report_path = os.path.join(FIGURES_DIR, "reports", f"ttft_slo_headroom_{memory}.pdf")
+        plot_single_report(image_paths, report_path, 4, 4)
+
+    # E2E SLO Headroom Reports
+    for memory in memory_configs:
+        suffixes = ["", "p50", "p90", "p99"]
+        categories = ["", "sand", "pebbles", "rocks"]
+
+        image_files = [
+            f"e2e_slo_headroom_{'_'.join(filter(None, [cat, suf]))}_{memory}.pdf".replace("__", "_")
+            for cat in categories
+            for suf in suffixes
+        ]
+
+        image_paths = [os.path.join(FIGURES_DIR, "benchmark", file) for file in image_files]
+        report_path = os.path.join(FIGURES_DIR, "reports", f"e2e_slo_headroom_{memory}.pdf")
+        plot_single_report(image_paths, report_path, 4, 4)
+
+    # TTFT SLO Violation Reports
+    for memory in memory_configs:
+        suffixes = ["", "p50", "p90", "p99"]
+        categories = ["", "sand", "pebbles", "rocks"]
+
+        image_files = [
+            f"ttft_slo_violation_{'_'.join(filter(None, [cat, suf]))}_{memory}.pdf".replace("__", "_")
+            for cat in categories
+            for suf in suffixes
+        ]
+
+        image_paths = [os.path.join(FIGURES_DIR, "benchmark", file) for file in image_files]
+        report_path = os.path.join(FIGURES_DIR, "reports", f"ttft_slo_violation_{memory}.pdf")
+        plot_single_report(image_paths, report_path, 4, 4)
+
+    # E2E SLO Violation Reports
+    for memory in memory_configs:
+        suffixes = ["", "p50", "p90", "p99"]
+        categories = ["", "sand", "pebbles", "rocks"]
+
+        image_files = [
+            f"e2e_slo_violation_{'_'.join(filter(None, [cat, suf]))}_{memory}.pdf".replace("__", "_")
+            for cat in categories
+            for suf in suffixes
+        ]
+
+        image_paths = [os.path.join(FIGURES_DIR, "benchmark", file) for file in image_files]
+        report_path = os.path.join(FIGURES_DIR, "reports", f"e2e_slo_violation_{memory}.pdf")
         plot_single_report(image_paths, report_path, 4, 4)
 
 def plot_legend():
@@ -262,6 +396,8 @@ def plot_legend():
     ax.axis("off")
 
     file_path = os.path.join(FIGURES_DIR, "benchmark", f"legend.pdf")
+    fig.savefig(file_path, dpi=300, bbox_inches="tight", format="pdf", transparent=True)
+    file_path = os.path.join(FIGURES_DIR, "reports", f"legend.pdf")
     fig.savefig(file_path, dpi=300, bbox_inches="tight", format="pdf", transparent=True)
     plt.close()
 
@@ -319,16 +455,6 @@ def load_experiment_outputs(experiment_ids, workloads):
                     continue
                 
                 eo_id = experiment_ids[memory][baseline][workload]
-
-                if "wip-iii" in eo_id:
-                    eo_id = eo_id.replace("wip-iii", "v0.0.2.naive-slo-aware")
-                
-                if "wip-ii" in eo_id:
-                    eo_id = eo_id.replace("wip-ii", "v0.0.2.naive-slo-aware")
-
-                if "wip" in eo_id:
-                    eo_id = eo_id.replace("wip", "v0.0.2.naive-slo-aware")
-                
                 eo = ExperimentOutput(id=eo_id)
                 eo.load()
                 eo.load_engine_stats()
@@ -452,6 +578,18 @@ if __name__ == "__main__":
             "supports_percentiles": True,
         },
         {
+            "ylabel": "Time in Queue Latency (s)",
+            "file_prefix": "tiqlat",
+            "compute_fn": "tiq_latency",
+            "supports_percentiles": True,
+        },
+        {
+            "ylabel": "Relative Delay (%)",
+            "file_prefix": "reldel",
+            "compute_fn": "relative_delay",
+            "supports_percentiles": True,
+        },
+        {
             "ylabel": "Throughput (req/s)",
             "file_prefix": "tp",
             "compute_fn": "throughput",
@@ -482,6 +620,62 @@ if __name__ == "__main__":
             "file_prefix": "aborted",
             "compute_fn": "aborted",
             "supports_percentiles": False,
+        },
+        {
+            "ylabel": "Num. of TTFT SLO Violations",
+            "file_prefix": "ttft_slo_violations",
+            "compute_fn": "slo_violations",
+            "extra_args": {"slo_map": ttft_slo_map, "latency_type": "ttft"},
+            "supports_percentiles": False,
+        },
+        {
+            "ylabel": "Num. of E2E SLO Violations",
+            "file_prefix": "e2e_slo_violations",
+            "compute_fn": "slo_violations",
+            "extra_args": {"slo_map": e2e_slo_map, "latency_type": "e2e"},
+            "supports_percentiles": False,
+        },
+        {
+            "ylabel": "TTFT SLO Violation (s)",
+            "file_prefix": "ttft_slo_violation",
+            "compute_fn": "slo_violation",
+            "extra_args": {"slo_map": ttft_slo_map, "latency_type": "ttft"},
+            "supports_percentiles": True,
+        },
+        {
+            "ylabel": "E2E SLO Violation (s)",
+            "file_prefix": "e2e_slo_violation",
+            "compute_fn": "slo_violation",
+            "extra_args": {"slo_map": e2e_slo_map, "latency_type": "e2e"},
+            "supports_percentiles": True,
+        },
+        {
+            "ylabel": "TTFT SLO Headroom (s)",
+            "file_prefix": "ttft_slo_headroom",
+            "compute_fn": "slo_headroom",
+            "extra_args": {"slo_map": ttft_slo_map, "latency_type": "ttft"},
+            "supports_percentiles": True,
+        },
+        {
+            "ylabel": "E2E SLO Headroom (s)",
+            "file_prefix": "e2e_slo_headroom",
+            "compute_fn": "slo_headroom",
+            "extra_args": {"slo_map": e2e_slo_map, "latency_type": "e2e"},
+            "supports_percentiles": True,
+        },
+        {
+            "ylabel": "TTFT SLO Delta (s)",
+            "file_prefix": "ttft_slo_delta",
+            "compute_fn": "latency_slo_delta",
+            "extra_args": {"slo_map": ttft_slo_map, "latency_type": "ttft"},
+            "supports_percentiles": True,
+        },
+        {
+            "ylabel": "E2E SLO Delta (s)",
+            "file_prefix": "e2e_slo_delta",
+            "compute_fn": "latency_slo_delta",
+            "extra_args": {"slo_map": e2e_slo_map, "latency_type": "e2e"},
+            "supports_percentiles": True,
         },
     ]
 
