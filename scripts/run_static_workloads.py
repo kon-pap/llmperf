@@ -84,7 +84,12 @@ if __name__ == '__main__':
             )
 
             modality_token_index = get_modality_token_index(request, model, multi_image=args.multi_image)
+
+            prompt_preparation_start = time.perf_counter()
             final_prompt = prepare_final_prompt(request, model, multi_image=args.multi_image)
+
+            prompt_preparation_end = time.perf_counter()
+            prompt_preparation_time = prompt_preparation_end - prompt_preparation_start
 
             req_outputs = llm.generate(
                 prompts=[final_prompt],
@@ -108,16 +113,16 @@ if __name__ == '__main__':
                         len(prompt_token_ids),
                         prompt_token_ids.count(modality_token_index),
                         int(output_length),
-                        aborted=True
+                        aborted=True,
+                        prompt_preparation_time=prompt_preparation_time
                     )
                 )
             else:
-                req_output = req_outputs[0]
-                outputs.append(
-                    RequestOutput.from_vllm_output(
-                        request.id, req_output, modality_token_index
-                    )
+                req_output = RequestOutput.from_vllm_output(
+                    request.id, req_outputs[0], modality_token_index
                 )
+                req_output.prompt_preparation_time = prompt_preparation_time
+                outputs.append(req_output)
 
     finally:
         elapsed_time = now - start_time

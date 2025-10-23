@@ -46,6 +46,9 @@ class RequestOutput:
     ttft_slo: Optional[float] = None
     tbt_slo: Optional[float] = None
 
+    # Other
+    prompt_preparation_time: Optional[float] = None
+
     @property
     def processor_time(self) -> float:
         return self.input_processed_time - self.arrival_time
