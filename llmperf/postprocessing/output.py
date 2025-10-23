@@ -134,15 +134,17 @@ class EngineStats:
     timestamps: List[float]
     kv_cache_usage: List[float]
     encoder_cache_usage: List[float]
-    preemptions_req_ids: List[List[str]]
+    preempted_req_ids: List[List[str]]
+    preempted_req_ts: List[List[float]]
     rescheduled_req_ids: List[List[str]]
+    rescheduled_req_ts: List[List[float]]
     kv_cache_usage_per_category: List[dict[str,float]]
     encoder_cache_usage_per_category: List[dict[str,float]]
 
     num_preemptions: List[int] = field(init=False)
 
     def __post_init__(self):
-        self.num_preemptions = [len(reqs) for reqs in self.preemptions_req_ids]
+        self.num_preemptions = [len(reqs) for reqs in self.preempted_req_ids]
 
 @dataclass
 class ExperimentOutput:
@@ -344,7 +346,6 @@ class ExperimentOutput:
 
         return attained_cnt / filtered_cnt * 100 if filtered_cnt else 0.0
 
-
     def e2e_slo_attainment(self, filter: Filter = None, slo_map: dict[str, float] = None) -> float:
         return self._slo_attainment("e2e", "slo", filter, slo_map)
 
@@ -403,8 +404,8 @@ class ExperimentOutput:
         req_id_to_ro = { ro.vllm_id: ro for ro in self.request_outputs }
 
         num_preemptions = 0
-        for preemptions_req_ids in self.engine_stats.preemptions_req_ids:
-            for req_id in preemptions_req_ids:
+        for preempted_req_ids in self.engine_stats.preempted_req_ids:
+            for req_id in preempted_req_ids:
                if not filter.include(req_id_to_ro[req_id]):
                    continue
                num_preemptions += 1
@@ -439,7 +440,10 @@ class ExperimentOutput:
             timestamps=df["timestamp"].tolist(),
             kv_cache_usage=df["kv_cache_usage"].tolist(),
             encoder_cache_usage=df["encoder_cache_usage"].tolist(),
-            preemptions_req_ids=[list(arr) for arr in df["preempted_req_ids"].tolist()],
+            rescheduled_req_ids=[list(arr) for arr in df["rescheduled_req_ids"].tolist()],
+            rescheduled_req_ts=[list(arr) for arr in df["rescheduled_req_ts"].tolist()],
+            preempted_req_ids=[list(arr) for arr in df["preempted_req_ids"].tolist()],
+            preempted_req_ts=[list(arr) for arr in df["preempted_req_ts"].tolist()],
             kv_cache_usage_per_category=df["kv_cache_usage_per_category"].tolist(),
             encoder_cache_usage_per_category=df["encoder_cache_usage_per_category"].tolist()
         )
