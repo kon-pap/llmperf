@@ -253,7 +253,7 @@ class ExperimentOutput:
         
         return Aggregator.aggregate(preemption_latencies, method)
     
-    def latency_slo_delta(self, latency_type: str = "e2e", method: str = "mean", filter: Filter = None) -> float:
+    def latency_slo_delta(self, latency_type: str = "e2e", method: str = "mean", filter: Filter = None, slo_map: dict[str, float] = None) -> float:
         if filter is None:
             filter = Filter()
         latency_attr, slo_attr = self.LATENCY_SLO_MAP[latency_type]
@@ -265,11 +265,13 @@ class ExperimentOutput:
              # latency - slo thres
             latency = getattr(ro, latency_attr)
             slo = getattr(ro, slo_attr)
+            if slo is None or slo == 0.0:
+                slo = slo_map.get(ro.id, float("inf"))
             request_deltas.append(latency - slo)
 
         return Aggregator.aggregate(request_deltas, method)
 
-    def slo_headroom(self, latency_type: str = "e2e", method: str = "mean", filter: Filter = None) -> float:
+    def slo_headroom(self, latency_type: str = "e2e", method: str = "mean", filter: Filter = None, slo_map: dict[str, float] = None) -> float:
         if filter is None:
             filter = Filter()
         latency_attr, slo_attr = self.LATENCY_SLO_MAP[latency_type]
@@ -280,6 +282,8 @@ class ExperimentOutput:
                 continue
             latency = getattr(ro, latency_attr)
             slo = getattr(ro, slo_attr)
+            if slo is None or slo == 0.0:
+                slo = slo_map.get(ro.id, float("inf"))
 
             # slo thres - latency (for negative deltas = for positive headrooms)
             headroom = slo - latency
@@ -288,7 +292,7 @@ class ExperimentOutput:
 
         return Aggregator.aggregate(request_headrooms, method)
 
-    def slo_violation(self, latency_type: str = "e2e", method: str = "mean", filter: Filter = None) -> float:
+    def slo_violation(self, latency_type: str = "e2e", method: str = "mean", filter: Filter = None, slo_map: dict[str, float] = None) -> float:
         if filter is None:
             filter = Filter()
         latency_attr, slo_attr = self.LATENCY_SLO_MAP[latency_type]
@@ -299,6 +303,8 @@ class ExperimentOutput:
                 continue
             latency = getattr(ro, latency_attr)
             slo = getattr(ro, slo_attr)
+            if slo is None or slo == 0.0:
+                slo = slo_map.get(ro.id, float("inf"))
 
             # latency - slo thres (for positive deltas = for negative headrooms)
             violation = latency - slo
@@ -307,7 +313,7 @@ class ExperimentOutput:
 
         return Aggregator.aggregate(request_violations, method)
 
-    def slo_violations(self, latency_type: str = "e2e", filter: Filter = None) -> int:
+    def slo_violations(self, latency_type: str = "e2e", filter: Filter = None, slo_map: dict[str, float] = None) -> int:
         if filter is None:
             filter = Filter()
         latency_attr, slo_attr = self.LATENCY_SLO_MAP[latency_type]
@@ -318,6 +324,8 @@ class ExperimentOutput:
                 continue
             latency = getattr(ro, latency_attr)
             slo = getattr(ro, slo_attr)
+            if slo is None or slo == 0.0:
+                slo = slo_map.get(ro.id, float("inf"))
             if latency > slo:
                 num_violations += 1
 
