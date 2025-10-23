@@ -26,7 +26,7 @@ class Model:
 MODELS = {
     Model(
         name="Mistral-7b",
-        path=os.path.join(MODELS_DIR, "Mistral-7B-Instruct-v0.2"),
+        path="mistralai/Mistral-7B-Instruct-v0.2",
         max_model_len=32768,
         alias="text-mistral"
     ),
@@ -101,7 +101,7 @@ MODELS = {
     ),
     Model(
         name="Qwen2-7B",
-        path="Qwen/Qwen2-VL-7B-Instruct",
+        path=os.path.join(MODELS_DIR, "Qwen2-VL-7B-Instruct"),
         max_model_len=32768,
         alias="qwen-2",
         image_token_index=151655,
@@ -109,7 +109,7 @@ MODELS = {
     ),
     Model(
         name="Qwen2-2B",
-        path="Qwen/Qwen2-VL-2B-Instruct",
+        path=os.path.join(MODELS_DIR, "Qwen2-VL-2B-Instruct"),
         max_model_len=32768,
         alias="qwen-2-small",
         image_token_index=151655,
@@ -171,6 +171,18 @@ MODELS = {
         alias="pixtral",
         image_token_index=10
     ),
+    Model(
+        name="Llama-2-13b",
+        path=os.path.join(MODELS_DIR, "Llama-2-13b-chat-hf"),
+        max_model_len=4096,
+        alias="llama-2"
+    ),
+    Model(
+        name="Llama-2-7b",
+        path=os.path.join(MODELS_DIR, "Llama-2-7b-chat-hf"),
+        max_model_len=4096,
+        alias="llama-2-small"
+    )
 }
 
 def get_model_by_name(name: str) -> Union[None, Model]:
