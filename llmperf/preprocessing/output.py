@@ -24,3 +24,6 @@ def get_llava_video_description_output(record: Dict) -> Optional[str]:
 
 def get_clotho_output(record: Dict) -> Optional[str]:
     return record["caption"]
+
+def get_mmbench_mc_output(record: Dict) -> Optional[str]:
+    return record["answer"]

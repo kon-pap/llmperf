@@ -3,9 +3,19 @@ import os
 
 from PIL import Image
 from typing import Dict, LiteralString, Union
+from typing import Dict, LiteralString, Union
+
+def get_image_path(dir: Union[str,LiteralString], record: Dict) -> LiteralString:
+    return os.path.join(dir, "images", record["image"])
+
+def get_video_path(dir: Union[str,LiteralString], record: Dict) -> LiteralString:
+    return os.path.join(dir, "videos", record["video"])
+
+def get_audio_path(dir: Union[str,LiteralString], record: Dict) -> LiteralString:
+    return os.path.join(dir, "audios", record["audio"])
 
 def get_image_size(dir: Union[str,LiteralString], record: Dict) -> Dict:
-    path = os.path.join(dir, "images", record["image"])
+    path = get_image_path(dir, record)
 
     with Image.open(path) as img:
         return {
@@ -31,7 +41,7 @@ def count_video_frames(path: str) -> int:
     return int(stream["nb_read_frames"])
     
 def get_video_size(dir: Union[str,LiteralString], record: Dict) -> Dict:
-    path = os.path.join(dir, "videos", record["video"])
+    path = get_video_path(dir, record)
     
     probe = ffmpeg.probe(path)
     stream = next((s for s in probe["streams"] if s["codec_type"] == "video"), None)
@@ -53,7 +63,7 @@ def get_video_size(dir: Union[str,LiteralString], record: Dict) -> Dict:
     }
 
 def get_audio_size(dir: Union[str,LiteralString], record: Dict) -> Dict:
-    path = os.path.join(dir, "audios", record["audio_id"])
+    path = get_audio_path(dir, record)
     
     probe = ffmpeg.probe(path)
     stream, fmt = probe["streams"][0], probe["format"]

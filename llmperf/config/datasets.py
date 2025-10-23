@@ -5,11 +5,37 @@ from dataclasses import dataclass, field
 from typing import Callable, Dict, List, LiteralString, Optional, Union
 
 from llmperf.constants import DATASETS_DIR
-from llmperf.preprocessing.input import get_clotho_input, get_llava_image_reasoning_input, get_llava_video_description_input, get_sharegpt_input, get_sharegpt_long_input
-from llmperf.preprocessing.output import get_clotho_output, get_llava_image_reasoning_output, get_llava_video_description_output, get_sharegpt_output, get_sharegpt_long_output
-from llmperf.preprocessing.modality_path import get_clotho_audio_path, get_llava_image_path, get_llava_video_path
-from llmperf.preprocessing.modality_size import get_audio_size, get_image_size, get_video_size
+from llmperf.preprocessing.input import (
+    get_clotho_input,
+    get_llava_image_reasoning_input,
+    get_llava_video_description_input,
+    get_sharegpt_input,
+    get_sharegpt_long_input,
+    get_mmbench_mc_input,
+    get_llavabench_qna_input,
+    get_cocoval_captioning_input,
+    get_videomme_mc_input,
+    get_mmbench_video_qna_input,
+    get_tempcompass_captioning_input,
+)
 
+from llmperf.preprocessing.output import (
+    get_clotho_output,
+    get_llava_image_reasoning_output,
+    get_llava_video_description_output,
+    get_sharegpt_output,
+    get_sharegpt_long_output,
+    get_mmbench_mc_output,
+)
+
+from llmperf.preprocessing.modality_info import (
+    get_audio_path,
+    get_audio_size,
+    get_image_path,
+    get_image_size,
+    get_video_path,
+    get_video_size,
+)
 @dataclass
 class Dataset:
     name: str
@@ -62,7 +88,7 @@ DATASETS = {
         color="#57B593",
         get_input=get_llava_image_reasoning_input,
         get_output=get_llava_image_reasoning_output,
-        _get_modality_path=get_llava_image_path,
+        _get_modality_path=get_image_path,
         _get_modality_size=get_image_size
     ),
     Dataset(
@@ -73,7 +99,7 @@ DATASETS = {
         color="#F8DE4B",
         get_input=get_llava_video_description_input,
         get_output=get_llava_video_description_output,
-        _get_modality_path=get_llava_video_path,
+        _get_modality_path=get_video_path,
         _get_modality_size=get_video_size
     ),
     Dataset(
@@ -84,7 +110,7 @@ DATASETS = {
         color="#E16F65",
         get_input=get_clotho_input,
         get_output=get_clotho_output,
-        _get_modality_path=get_clotho_audio_path,
+        _get_modality_path=get_audio_path,
         _get_modality_size=get_audio_size
     ),
     Dataset(
@@ -95,6 +121,72 @@ DATASETS = {
         color="#000000",
         get_input=get_sharegpt_long_input,
         get_output=get_sharegpt_long_output
+    ),
+    Dataset(
+        name="Multiple Choice (MMBench)",
+        path=os.path.join(DATASETS_DIR, "MMBench"),
+        file="multiple_choice.jsonl",
+        alias="mmbench-mc",
+        color="#57B593",
+        get_input=get_mmbench_mc_input,
+        get_output=get_mmbench_mc_output,
+        _get_modality_path=get_image_path,
+        _get_modality_size=get_image_size
+    ),
+    Dataset(
+        name="Q&A (LLaVABench)",
+        path=os.path.join(DATASETS_DIR, "LLaVABench"),
+        file="qna.jsonl",
+        alias="llavabench-qna",
+        color="#57B593",
+        get_input=get_llavabench_qna_input,
+        get_output=get_clotho_output,
+        _get_modality_path=get_image_path,
+        _get_modality_size=get_image_size
+    ),
+    Dataset(
+        name="Captioning (COCO-Val)",
+        path=os.path.join(DATASETS_DIR, "COCO-Val"),
+        file="captioning.jsonl",
+        alias="cocoval-captioning",
+        color="#57B593",
+        get_input=get_cocoval_captioning_input,
+        get_output=get_mmbench_mc_output,
+        _get_modality_path=get_image_path,
+        _get_modality_size=get_image_size
+    ),
+    Dataset(
+        name="Multiple Choice (Video-MME)",
+        path=os.path.join(DATASETS_DIR, "Video-MME"),
+        file="multiple_choice.jsonl",
+        alias="videomme-mc",
+        color="#F8DE4B",
+        get_input=get_videomme_mc_input,
+        get_output=get_mmbench_mc_output,
+        _get_modality_path=get_video_path,
+        _get_modality_size=get_video_size
+    ),
+    Dataset(
+        name="Q&A (MMBench-Video)",
+        path=os.path.join(DATASETS_DIR, "MMBench-Video"),
+        file="qna.jsonl",
+        alias="mmbench-video-qna",
+        color="#F8DE4B",
+        get_input=get_mmbench_video_qna_input,
+        get_output=get_mmbench_mc_output,
+        _get_modality_path=get_video_path,
+        _get_modality_size=get_video_size
+    ),
+    Dataset(
+        name="Captioning (TempCompass)",
+        path=os.path.join(DATASETS_DIR, "TempCompass"),
+        file="captioning.jsonl",
+        alias="tempcompass-captioning",
+        color="#F8DE4B",
+        get_input=get_tempcompass_captioning_input,
+        get_output=get_mmbench_mc_output,
+        _get_modality_path=get_video_path,
+        _get_modality_size=get_video_size
     )
 }
 
