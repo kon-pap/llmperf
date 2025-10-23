@@ -556,6 +556,51 @@ _WORKLOADS_SMALL_BENCHMARK = {
     )
 }
 
+_WORKLOADS_ACCURACY_BENCHMARK = {
+    Workload(
+        name="Multiple Choice (MMBench)",
+        path=os.path.join(WORKLOADS_DIR, "static"),
+        alias="mmbench-mc",
+        modalities="image",
+        modality_pct=1.0
+    ),
+    Workload(
+        name="Q&A (LLaVABench)",
+        path=os.path.join(WORKLOADS_DIR, "static"),
+        alias="llavabench-qna",
+        modalities="image",
+        modality_pct=1.0
+    ),
+    Workload(
+        name="Captioning (COCO-Val)",
+        path=os.path.join(WORKLOADS_DIR, "static"),
+        alias="cocoval-captioning",
+        modalities="image",
+        modality_pct=1.0
+    ),
+    Workload(
+        name="Multiple Choice (Video-MME)",
+        path=os.path.join(WORKLOADS_DIR, "static"),
+        alias="videomme-mc",
+        modalities="video",
+        modality_pct=1.0
+    ),
+    Workload(
+        name="Q&A (MMBench-Video)",
+        path=os.path.join(WORKLOADS_DIR, "static"),
+        alias="mmbench-video-qna",
+        modalities="video",
+        modality_pct=1.0
+    ),
+    Workload(
+        name="Captioning (TempCompass)",
+        path=os.path.join(WORKLOADS_DIR, "static"),
+        alias="tempcompass-captioning",
+        modalities="video",
+        modality_pct=1.0
+    )
+}
+
 WORKLOADS = _WORKLOADS_STATIC | \
     _WORKLOADS_TEXT_POISSON | \
     _WORKLOADS_MIX_POISSON_15 | \
@@ -573,7 +618,8 @@ WORKLOADS = _WORKLOADS_STATIC | \
     _WORKLOADS_MULTI_STREAM_V | \
     _WORKLOADS_MULTI_STREAM_TI | \
     _WORKLOADS_MULTI_STREAM_TIV | \
-    _WORKLOADS_SMALL_BENCHMARK
+    _WORKLOADS_SMALL_BENCHMARK | \
+    _WORKLOADS_ACCURACY_BENCHMARK
 
 def get_workload_by_name(name: str) -> Union[None, Workload]:
     for workload in WORKLOADS:
