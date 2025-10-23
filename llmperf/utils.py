@@ -16,6 +16,7 @@ from vllm.assets.video import VideoAsset
 
 from llmperf.config.models import Model
 from llmperf.config.workloads import Request
+from llmperf.constants import ALL_STRATEGY_PARAMS
 
 def get_version(package_name: str) -> str:
     try:
@@ -52,7 +53,8 @@ def get_version(package_name: str) -> str:
 def create_experiment_id(
     workload: str, model: str, approach: str,
     gpu_util: float, swap_space: int, num_gpu_blocks: Optional[int],
-    max_model_len: Optional[int], max_num_batched_tokens: Optional[int]
+    max_model_len: Optional[int], max_num_batched_tokens: Optional[int],
+    **kwargs
 ) -> str:
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     version = get_version("vllm")
@@ -73,6 +75,9 @@ def create_experiment_id(
         f"gpu{gpu_util}",
         f"swap{swap_space}",
     ]
+
+    for key, value in kwargs.items():
+        parts.append(f"{key}{value}")
 
     return "__".join(parts)
 
@@ -119,11 +124,26 @@ def prepare_text_prompt(request: Request, model: Model) -> Dict:
     }
     return final_prompt
 
-def prepare_image_prompt(request: Request, model: Model) -> Dict:
+def prepare_image_prompt(request: Request, model: Model, compression_ratio: float = None) -> Dict:
+    image = load_image(request.modality_path)
+
+    if image.mode != "RGB" and model.alias.startswith("gemma-3"):
+        image = image.convert("RGB")
+
+    if compression_ratio:
+        # Proportional Compression
+        w, h = image.size
+        if model.alias.startswith("qwen-2"):
+            n_w = max(28, int(w - (compression_ratio * w)))
+            n_h = max(28, int(h - (compression_ratio * h)))
+        else:
+            n_w = int(w - (compression_ratio * w))
+            n_h = int(h - (compression_ratio * h))
+        image = image.resize((n_w, n_h), resample=Image.Resampling.LANCZOS)
+
     processor = AutoProcessor.from_pretrained(model.path, use_fast=True)
 
     if processor.chat_template is None:
-        image = load_image(request.modality_path)
         return {
             "prompt": f"<|User|>: <image>\n{request.input}\n\n<|Assistant|>:",
             "multi_modal_data": {"image": image}
@@ -143,11 +163,6 @@ def prepare_image_prompt(request: Request, model: Model) -> Dict:
         add_generation_prompt=True,
         tokenize=False
     )
-    
-    image = load_image(request.modality_path)
-
-    if image.mode != "RGB" and model.alias.startswith("gemma-3"):
-        image = image.convert("RGB")
 
     final_prompt = {
         "prompt": formatted_prompt,
@@ -155,17 +170,19 @@ def prepare_image_prompt(request: Request, model: Model) -> Dict:
     }
     return final_prompt
 
-def prepare_multi_image_prompt(request: Request, model: Model) -> Dict:
+def prepare_multi_image_prompt(request: Request, model: Model, num_frames: int = None, strategy: str = None, smart_resize: bool = False) -> Dict:
     processor = AutoProcessor.from_pretrained(model.path, use_fast=True)
 
     num_available_frames = request.modality_size["frame_count"]
     if num_available_frames == 0:
         return {}
 
-    num_frames = duration_to_frames(request.modality_size["duration"])
+    if not num_frames:
+        num_frames = duration_to_frames(request.modality_size["duration"])
     num_frames = num_available_frames if num_available_frames < num_frames else num_frames
 
-    video = VideoAsset(name=request.modality_path, num_frames=num_frames).np_ndarrays
+    strategy_params = ALL_STRATEGY_PARAMS.get(strategy, {})
+    video = VideoAsset(name=request.modality_path, num_frames=num_frames, strategy=strategy, strategy_params=strategy_params, smart_resize=smart_resize).np_ndarrays
     frames = []
     for frame in video:
         image = load_image_from_array(frame)
@@ -180,7 +197,7 @@ def prepare_multi_image_prompt(request: Request, model: Model) -> Dict:
             "multi_modal_data": {"image": frames}
         }
 
-    frame_placeholders = [{"type": "image"}]  * num_frames
+    frame_placeholders = [{"type": "image"}]  * len(frames)
     prompt = [
         {
             "role": "user",
@@ -202,7 +219,7 @@ def prepare_multi_image_prompt(request: Request, model: Model) -> Dict:
     }
     return final_prompt
 
-def prepare_video_prompt(request: Request, model: Model) -> Dict:
+def prepare_video_prompt(request: Request, model: Model, num_frames: int = None, strategy: str = None, smart_resize: bool = False) -> Dict:
     processor = AutoProcessor.from_pretrained(model.path, use_fast=True)
     prompt = [
         {
@@ -218,15 +235,17 @@ def prepare_video_prompt(request: Request, model: Model) -> Dict:
         add_generation_prompt=True,
         tokenize=False
     )
-    
+
     num_available_frames = request.modality_size["frame_count"]
     if num_available_frames == 0:
         return {}
 
-    num_frames = duration_to_frames(request.modality_size["duration"])
+    if not num_frames:
+        num_frames = duration_to_frames(request.modality_size["duration"])
     num_frames = num_available_frames if num_available_frames < num_frames else num_frames
     
-    video = VideoAsset(name=request.modality_path, num_frames=num_frames).np_ndarrays
+    strategy_params = ALL_STRATEGY_PARAMS.get(strategy, {})
+    video = VideoAsset(name=request.modality_path, num_frames=num_frames, strategy=strategy, strategy_params=strategy_params, smart_resize=smart_resize).np_ndarrays
 
     final_prompt = {
         "prompt": formatted_prompt,
@@ -265,7 +284,7 @@ def prepare_audio_prompt(request: Request, model: Model) -> Dict:
 
 def get_modality_token_index(request: Request, model: Model, multi_image: bool = False) -> int:
     image_codecs = {"JPEG"}
-    video_codecs = {"h264", "vp6f", "vp9"}
+    video_codecs = {"h264", "vp6f", "vp9", "mp4"}
     audio_codecs = {"pcm_s16le"}
     
     if request.modality_path is None:
@@ -282,17 +301,19 @@ def get_modality_token_index(request: Request, model: Model, multi_image: bool =
     else:
         return -1
     
-def prepare_final_prompt(request: Request, model: Model, multi_image: bool = False) -> Dict:
+def prepare_final_prompt(request: Request, model: Model, multi_image: bool = False,
+                         num_frames: int = None, strategy: str = None,
+                         compression_ratio: float = None, smart_resize: bool = False) -> Dict:
     modality_token_index = get_modality_token_index(request, model)
 
-    if multi_image and modality_token_index == -1:
-        final_prompt = prepare_multi_image_prompt(request, model)
+    if multi_image and modality_token_index != -1:
+        final_prompt = prepare_multi_image_prompt(request, model, num_frames, strategy, smart_resize)
 
     elif modality_token_index == model.image_token_index:
-        final_prompt = prepare_image_prompt(request, model)
+        final_prompt = prepare_image_prompt(request, model, compression_ratio)
 
     elif modality_token_index == model.video_token_index:
-        final_prompt = prepare_video_prompt(request, model)
+        final_prompt = prepare_video_prompt(request, model, num_frames, strategy, smart_resize)
 
     elif modality_token_index == model.audio_token_index:
         final_prompt = prepare_audio_prompt(request, model)

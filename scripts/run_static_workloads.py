@@ -34,8 +34,25 @@ def parse_args():
 
     parser.add_argument("--multi-image", action="store_true",
                         help="Use multiple images instead of video")
+    
+    parser.add_argument("--num-frames", type=int, default=None,
+                        help="Number of max frames for videos")
+    
+    parser.add_argument("--strategy", type=str, default=None,
+                        help="Compression strategy for videos")
+    
+    parser.add_argument("--compression-ratio", type=float, default=None,
+                        help="Compression ratio for images")
+    
+    parser.add_argument("--smart-resize", action="store_true",
+                        help="Compression ratio for images")
+    
+    args = parser.parse_args()
+    
+    if bool(args.num_frames) ^ bool(args.strategy):
+        parser.error("You must provide both --num-frames and --strategy, or neither.")
 
-    return parser.parse_args()
+    return args
 
 if __name__ == '__main__':
     args = parse_args()
@@ -86,7 +103,15 @@ if __name__ == '__main__':
             modality_token_index = get_modality_token_index(request, model, multi_image=args.multi_image)
 
             prompt_preparation_start = time.perf_counter()
-            final_prompt = prepare_final_prompt(request, model, multi_image=args.multi_image)
+            final_prompt = prepare_final_prompt(
+                request,
+                model,
+                multi_image=args.multi_image,
+                num_frames=args.num_frames,
+                strategy=args.strategy,
+                compression_ratio=args.compression_ratio,
+                smart_resize=args.smart_resize
+            )
 
             prompt_preparation_end = time.perf_counter()
             prompt_preparation_time = prompt_preparation_end - prompt_preparation_start
@@ -126,6 +151,14 @@ if __name__ == '__main__':
 
     finally:
         elapsed_time = now - start_time
+        extra_kwargs = {}
+        if args.compression_ratio:
+            extra_kwargs["cr"] = f"{args.compression_ratio*100:.0f}"
+        if args.strategy:
+            extra_kwargs["strat"] = args.strategy
+        if args.strategy:
+            extra_kwargs["frame"] = args.num_frames
+            
         experiment_id = create_experiment_id(
             workload.alias,
             model.alias,
@@ -134,7 +167,8 @@ if __name__ == '__main__':
             args.swap_space,
             args.num_gpu_blocks_override,
             args.max_model_len,
-            args.max_num_batched_tokens
+            args.max_num_batched_tokens,
+            **extra_kwargs
         )
 
         if elapsed_time == 0:
