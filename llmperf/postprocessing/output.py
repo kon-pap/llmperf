@@ -268,6 +268,64 @@ class ExperimentOutput:
         
         return Aggregator.aggregate(preemption_latencies, method)
     
+    def relative_delay(self, method: str = "mean", filter: Filter = None) -> float:
+        if filter is None:
+            filter = Filter()
+
+        filtered_req_ids = {ro.vllm_id for ro in self.request_outputs if filter.include(ro)}
+
+        preemptions = []
+        for preempted_ids, preempted_ts in zip(self.engine_stats.preempted_req_ids, self.engine_stats.preempted_req_ts):
+            for req_id, ts in zip(preempted_ids, preempted_ts):
+                preemptions.append((req_id, ts))
+
+        reschedules = []
+        for rescheduled_ids, rescheduled_ts in zip(self.engine_stats.rescheduled_req_ids, self.engine_stats.rescheduled_req_ts):
+            for req_id, ts in zip(rescheduled_ids, rescheduled_ts):
+                reschedules.append((req_id, ts))
+
+        preempted_dict = defaultdict(list)
+        for req_id, ts in preemptions:
+            preempted_dict[req_id].append(ts)
+
+        rescheduled_dict = defaultdict(list)
+        for req_id, ts in reschedules:
+            rescheduled_dict[req_id].append(ts)
+
+        for req_id in preempted_dict:
+            preempted_dict[req_id].sort()
+        
+        for req_id in rescheduled_dict:
+            rescheduled_dict[req_id].sort()
+
+        preemption_deltas = defaultdict(list)
+        for req_id, pre_ts_list in preempted_dict.items():
+            if req_id not in rescheduled_dict:
+                continue
+
+            res_ts_list = rescheduled_dict[req_id]
+            res_idx = 0
+
+            for pre_ts in pre_ts_list:
+                while res_idx < len(res_ts_list) and res_ts_list[res_idx] <= pre_ts:
+                    res_idx += 1
+                if res_idx < len(res_ts_list):
+                    delta = res_ts_list[res_idx] - pre_ts
+                    preemption_deltas[req_id].append(delta)
+                    res_idx += 1
+
+        req_id_to_ro = {ro.vllm_id: ro for ro in self.request_outputs}
+        relative_delays = []
+        for req_id, deltas in preemption_deltas.items():
+            if req_id in filtered_req_ids:
+                preemption_latency = sum(deltas)
+                tiq_latency = req_id_to_ro[req_id].time_in_queue
+                e2e_latency = req_id_to_ro[req_id].e2e
+
+                relative_delays.append((preemption_latency + tiq_latency) / e2e_latency)
+        
+        return Aggregator.aggregate(relative_delays, method)
+
     def latency_slo_delta(self, latency_type: str = "e2e", method: str = "mean", filter: Filter = None, slo_map: dict[str, float] = None) -> float:
         if filter is None:
             filter = Filter()
