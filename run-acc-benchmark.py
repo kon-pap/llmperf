@@ -54,7 +54,7 @@ strategies = ["uniform", "scene_change", "sharpness_based", "motion_based"]
 num_frames = [4, 8, 16, 32, 64]
 
 video_workloads = [
-    {"workload": wl, "strategy": strategy, "num_frames": nf}
+    {"workload": wl, "strategy": strategy, "num-frames": nf}
     for wl in vid_workload_aliases
     for strategy in strategies
     for nf in num_frames
