@@ -170,7 +170,7 @@ def prepare_image_prompt(request: Request, model: Model, compression_ratio: floa
     }
     return final_prompt
 
-def prepare_multi_image_prompt(request: Request, model: Model, num_frames: int = None, strategy: str = None, smart_resize: bool = False) -> Dict:
+def prepare_multi_image_prompt(request: Request, model: Model, num_frames: int = None, strategy: str = "uniform", smart_resize: bool = False) -> Dict:
     processor = AutoProcessor.from_pretrained(model.path, use_fast=True)
 
     num_available_frames = request.modality_size["frame_count"]
@@ -219,7 +219,7 @@ def prepare_multi_image_prompt(request: Request, model: Model, num_frames: int =
     }
     return final_prompt
 
-def prepare_video_prompt(request: Request, model: Model, num_frames: int = None, strategy: str = None, smart_resize: bool = False) -> Dict:
+def prepare_video_prompt(request: Request, model: Model, num_frames: int = None, strategy: str = "uniform", smart_resize: bool = False) -> Dict:
     processor = AutoProcessor.from_pretrained(model.path, use_fast=True)
     prompt = [
         {
@@ -302,7 +302,7 @@ def get_modality_token_index(request: Request, model: Model, multi_image: bool =
         return -1
     
 def prepare_final_prompt(request: Request, model: Model, multi_image: bool = False,
-                         num_frames: int = None, strategy: str = None,
+                         num_frames: int = None, strategy: str = "uniform",
                          compression_ratio: float = None, smart_resize: bool = False) -> Dict:
     modality_token_index = get_modality_token_index(request, model, multi_image)
 
