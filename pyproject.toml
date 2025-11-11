@@ -20,7 +20,8 @@ dependencies = [
     "pandas>=2.2.3",
     "pyarrow>=18.0.0",
     "numpy>=1.26.4",
-    "pymupdf>=1.26.4"
+    "pymupdf>=1.26.4",
+    "evaluate"
 ]
 
 [project.urls]
