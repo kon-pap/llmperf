@@ -53,6 +53,8 @@ class Workload:
                 file.write(json.dumps(entry) + "\n")
 
     def load(self):
+        self.requests = []
+        self.timestamps = []
         path = os.path.join(self.path, f"{self.alias}.jsonl")
         with open(path, "r", encoding="utf-8") as file:
             for line in file:
