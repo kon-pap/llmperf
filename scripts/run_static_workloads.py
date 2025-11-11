@@ -1,5 +1,6 @@
 import argparse
 import time
+import signal
 
 from transformers import AutoTokenizer
 from tqdm import tqdm
@@ -53,6 +54,16 @@ def parse_args():
         parser.error("You must provide both --num-frames and --strategy, or neither.")
 
     return args
+
+def term_handler(signum, frame):
+    print(f"Got signal {signum}", flush=True)
+    if frame is not None and hasattr(frame, "f_code"):
+        print(f"Interrupted in {frame.f_code.co_filename}:{frame.f_lineno}", flush=True)
+    else:
+        print("No valid frame info available.", flush=True)
+    raise KeyboardInterrupt
+
+signal.signal(signal.SIGINT, term_handler)
 
 if __name__ == '__main__':
     args = parse_args()
@@ -148,6 +159,9 @@ if __name__ == '__main__':
                 )
                 req_output.prompt_preparation_time = prompt_preparation_time
                 outputs.append(req_output)
+
+    except KeyboardInterrupt:
+        print("Caught KeyboardInterrupt (from signal or Ctrl-C)", flush=True)
 
     finally:
         elapsed_time = now - start_time
