@@ -304,7 +304,7 @@ def get_modality_token_index(request: Request, model: Model, multi_image: bool =
 def prepare_final_prompt(request: Request, model: Model, multi_image: bool = False,
                          num_frames: int = None, strategy: str = None,
                          compression_ratio: float = None, smart_resize: bool = False) -> Dict:
-    modality_token_index = get_modality_token_index(request, model)
+    modality_token_index = get_modality_token_index(request, model, multi_image)
 
     if multi_image and modality_token_index != -1:
         final_prompt = prepare_multi_image_prompt(request, model, num_frames, strategy, smart_resize)
