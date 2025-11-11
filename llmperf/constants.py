@@ -10,6 +10,7 @@ EXPERIMENTS_OUTPUTS_DIR = os.path.join(ARTIFACTS_DIR, "outputs")
 EXPERIMENTS_ENGINE_STATS_DIR = os.path.join(ARTIFACTS_DIR, "stats")
 FIGURES_DIR = os.path.join(ARTIFACTS_DIR, "figures")
 WORKLOADS_DIR = os.path.join(ARTIFACTS_DIR, "workloads")
+EXPERIMENTS_LOG = os.path.join(ARTIFACTS_DIR, "benchmark-log.jsonl")
 
 ALL_STRATEGY_PARAMS = {
     "scene_change": {"content_threshold": 27.0},
