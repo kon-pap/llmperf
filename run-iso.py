@@ -31,6 +31,7 @@ workloads = {
         {"workload": "text-static"},
         {"workload": "image-static"},
         {"workload": "video-static"},
+        {"workload": "text-static-long"}
     ],
     "llava-ov": [
         {"workload": "text-static"},
@@ -42,26 +43,31 @@ workloads = {
         {"workload": "text-static", "max-model-len": 32768, "max-num-batched-tokens": 32768, "num-gpu-blocks-override": 2048},
         {"workload": "image-static", "max-model-len": 32768, "max-num-batched-tokens": 32768, "num-gpu-blocks-override": 2048},
         {"workload": "video-static", "max-model-len": 32768, "max-num-batched-tokens": 32768, "num-gpu-blocks-override": 2048, "multi-image": True},
+        {"workload": "text-static-long", "max-model-len": 32768, "max-num-batched-tokens": 32768, "num-gpu-blocks-override": 2048}
     ],
     "gemma-3": [
         {"workload": "text-static", "max-model-len": 16384, "max-num-batched-tokens": 16384, "num-gpu-blocks-override": 1024},
         {"workload": "image-static", "max-model-len": 16384, "max-num-batched-tokens": 16384, "num-gpu-blocks-override": 1024},
         {"workload": "video-static", "max-model-len": 18432, "max-num-batched-tokens": 16384, "num-gpu-blocks-override": 1152, "multi-image": True, "gpu-util": 0.98},
+        {"workload": "text-static-long", "max-model-len": 16384, "max-num-batched-tokens": 16384, "num-gpu-blocks-override": 1024}
     ],
     "qwen-2.5-small": [
         {"workload": "text-static", "max-model-len": 32768, "max-num-batched-tokens": 32768, "num-gpu-blocks-override": 2048},
         {"workload": "image-static", "max-model-len": 32768, "max-num-batched-tokens": 32768, "num-gpu-blocks-override": 2048},
         {"workload": "video-static", "max-model-len": 128000, "max-num-batched-tokens": 128000, "num-gpu-blocks-override": 8000},
+        {"workload": "text-static-long", "max-model-len": 32768, "max-num-batched-tokens": 32768, "num-gpu-blocks-override": 2048},
     ],
     "qwen-2.5": [
         {"workload": "text-static", "max-model-len": 32768, "max-num-batched-tokens": 32768, "num-gpu-blocks-override": 2048},
         {"workload": "image-static", "max-model-len": 32768, "max-num-batched-tokens": 32768, "num-gpu-blocks-override": 2048},
         {"workload": "video-static", "max-model-len": 82112, "max-num-batched-tokens": 80970, "num-gpu-blocks-override": 5132},
+        {"workload": "text-static-long", "max-model-len": 32768, "max-num-batched-tokens": 32768, "num-gpu-blocks-override": 2048}
     ],
     "pixtral": [
         {"workload": "text-static", "max-model-len": 32768, "max-num-batched-tokens": 32768, "num-gpu-blocks-override": 2048},
         {"workload": "image-static", "max-model-len": 32768, "max-num-batched-tokens": 32768, "num-gpu-blocks-override": 2048},
         {"workload": "video-static", "max-model-len": 45056, "max-num-batched-tokens": 45056, "num-gpu-blocks-override": 2816, "multi-image": True},
+        {"workload": "text-static-long", "max-model-len": 32768, "max-num-batched-tokens": 32768, "num-gpu-blocks-override": 2048}
     ],
 }
 
