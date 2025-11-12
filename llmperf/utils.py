@@ -12,11 +12,11 @@ from typing import Dict, Optional
 from urllib.parse import urlparse, unquote
 
 from vllm.assets.audio import AudioAsset
-from vllm.assets.video import VideoAsset
 
 from llmperf.config.models import Model
 from llmperf.config.workloads import Request
 from llmperf.constants import ALL_STRATEGY_PARAMS
+from llmperf.promptpreparation.video import VideoAsset
 
 def get_version(package_name: str) -> str:
     try:
