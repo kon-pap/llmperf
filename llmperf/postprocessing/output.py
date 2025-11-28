@@ -512,6 +512,15 @@ class ExperimentOutput:
                
         return aborted
 
+    def kv_cache_usg(self, category: str = None, method: str = "mean") -> float:
+        if category and self.engine_stats.kv_cache_usage_per_category and \
+            category in self.engine_stats.kv_cache_usage_per_category[0]:
+            usg = [usg[category] for usg in self.engine_stats.kv_cache_usage_per_category]
+        else:
+            usg = [usg for usg in self.engine_stats.kv_cache_usage]
+    
+        return Aggregator.aggregate(usg, method)
+
     def save_engine_stats(self, log_file: Union[str,LiteralString]):
         path = os.path.join(self.engine_stats_path or EXPERIMENTS_ENGINE_STATS_DIR, f"{self.id}.parquet")
 
