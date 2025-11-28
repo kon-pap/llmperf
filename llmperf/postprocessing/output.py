@@ -157,10 +157,11 @@ class ExperimentOutput:
     id: str
     elapsed_time: float =  None
     request_outputs: List[RequestOutput] = field(default_factory=list)
+    engine_stats: Optional[EngineStats] = None
+
     output_path: Optional[Union[str,LiteralString]] = None
     output_log_path: Optional[Union[str,LiteralString]] = None
     engine_stats_path: Optional[Union[str,LiteralString]] = None
-    engine_stats: Optional[EngineStats] = None
 
     LATENCY_SLO_MAP = {
         "e2e": ("e2e", "slo"),
@@ -548,7 +549,7 @@ class ExperimentOutput:
             "requests_per_second": self.requests_per_second,
             "tokens_per_second": self.tokens_per_second
         }
-        with open(EXPERIMENTS_LOG, "a", encoding="utf-8") as file:
+        with open(self.output_log_path or EXPERIMENTS_LOG, "a", encoding="utf-8") as file:
                 file.write(json.dumps(system_output) + "\n")
 
     def load(self):
