@@ -301,13 +301,20 @@ def get_modality_token_index(request: Request, model: Model, multi_image: bool =
     else:
         return -1
     
+def is_video(request: Request) -> bool:
+    return request.modality_size["codec"] in {"h264", "vp6f", "vp9", "mp4"}
+
 def prepare_final_prompt(request: Request, model: Model, multi_image: bool = False,
                          num_frames: int = None, strategy: str = "uniform",
                          compression_ratio: float = None, smart_resize: bool = False) -> Dict:
     modality_token_index = get_modality_token_index(request, model, multi_image)
 
     if multi_image and modality_token_index != -1:
-        final_prompt = prepare_multi_image_prompt(request, model, num_frames, strategy, smart_resize)
+        if is_video(request):
+            final_prompt = prepare_multi_image_prompt(request, model, num_frames, strategy, smart_resize)
+        else:
+            final_prompt = prepare_image_prompt(request, model, compression_ratio)
+        
 
     elif modality_token_index == model.image_token_index:
         final_prompt = prepare_image_prompt(request, model, compression_ratio)
