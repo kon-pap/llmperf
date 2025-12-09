@@ -456,7 +456,7 @@ class ExperimentOutput:
             finished_time = max(finished_time, ro.finished_time)
             request_cnt += 1
         
-        return (finished_time - start_time) / request_cnt if request_cnt else 0
+        return request_cnt / (finished_time - start_time) if request_cnt else 0
     
     def goodput(self, filter: Filter = None, slo_map: dict[str, float] = None) -> float:
         if filter is None:
@@ -482,7 +482,7 @@ class ExperimentOutput:
             start_time = min(start_time, ro.arrival_time)
             finished_time = max(finished_time, ro.finished_time)
 
-        return (finished_time - start_time) / attained_cnt if attained_cnt else 0
+        return attained_cnt / (finished_time - start_time) if attained_cnt else 0
 
     def preemptions(self, filter: Filter = None) -> int:
         if filter is None:
